@@ -89,7 +89,7 @@ async function friendRequestRefuse(friendRequestId){
 //친구 상태 확인 api
 async function getFriend(myId,userId){
     const options = {
-        method: 'GET',
+        method: 'GET'
     };
 
     const response = await fetchWithAuth(``,options);
@@ -107,7 +107,7 @@ async function getFriend(myId,userId){
 async function getFriends(){
 
     const options = {
-        method: 'GET',
+        method: 'GET'
     };
 
     try{
@@ -115,6 +115,7 @@ async function getFriends(){
         let response= await fetchWithAuth(`/api/friends?memberId=${myId}`,options);
         return response.json();
     } catch(error){
+        alert("잠시 후 다시 시도해주시길 바랍니다.");
         console.log(error);
     }
 
@@ -196,4 +197,73 @@ async function sendFriendRequest(myId,userId) {
     }
 
 }
+//받은 친구요청 조회 api
+async function receivedRequestAPI(){
+    const options = {
+        method: 'GET'
+    };
 
+    try{
+        let myId = sessionStorage.getItem('userId');
+        let response= await fetchWithAuth(`/api/friend-request/received?receiverId=${myId}`,options);
+        return response.json();
+    } catch(error){
+        alert("잠시 후 다시 시도해주시길 바랍니다.");
+        console.log(error);
+    }
+
+}
+
+//보낸 친구요청 조회 api
+async function sentRequestAPI(){
+    const options = {
+        method: 'GET'
+    };
+
+    try{
+        let myId = sessionStorage.getItem('userId');
+        let response= await fetchWithAuth(`/api/friend-request/sent?senderId=${myId}`,options);
+        return response.json();
+    } catch(error){
+        alert("잠시 후 다시 시도해주시길 바랍니다.");
+        console.log(error);
+    }
+
+}
+
+
+//받은 친구요청 렌더링
+function renderReceivedRequest(receivedRequests){
+    let receivedArea = document.getElementById('received');
+    receivedArea.style.removeProperty("height");
+    receivedArea.querySelector('.noFriendRequest').style.display = 'none';
+    let receivedDiv = receivedArea.querySelector('.receivedRequestArea');
+    receivedRequests.forEach(function(receivedRequest){
+        let friendRequestTemplate = document.getElementById('received-friendRequest-template').content.cloneNode(true);
+        friendRequestTemplate.querySelector('.friendReq').setAttribute('data-friendRequest-id',receivedRequest.friendRequestId);
+        friendRequestTemplate.querySelector('.friendProfile').setAttribute('data-sender-id',receivedRequest.senderId);
+        friendRequestTemplate.querySelector('.nickname').textContent = receivedRequest.nickname;
+        if(receivedRequest.profilePath){
+            friendRequestTemplate.querySelector('.profileImg').src =  receivedRequest.profilePath;
+        }
+        receivedDiv.appendChild(friendRequestTemplate);
+    });
+}
+
+//보낸 친구요청 렌더링
+function renderSentRequest(sentRequests){
+    let sentArea = document.getElementById('sent');
+    sentArea.style.removeProperty("height");
+    sentArea.querySelector('.noFriendRequest').style.display = 'none';
+    let sentDiv = sentArea.querySelector('.sentRequestArea');
+    sentRequests.forEach(function(sentRequest){
+        let friendRequestTemplate = document.getElementById('sent-friendRequest-template').content.cloneNode(true);
+        friendRequestTemplate.querySelector('.friendReq').setAttribute('data-friendRequest-id',sentRequest.friendRequestId);
+        friendRequestTemplate.querySelector('.friendProfile').setAttribute('data-receiver-id',sentRequest.receiverId);
+        friendRequestTemplate.querySelector('.nickname').textContent = sentRequest.nickname;
+        if(sentRequest.profilePath){
+            friendRequestTemplate.querySelector('.profileImg').src =  sentRequest.profilePath;
+        }
+        sentDiv.appendChild(friendRequestTemplate);
+    });
+}

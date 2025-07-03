@@ -12,11 +12,13 @@ public class SentFriendRequestDto {
     private Long senderId;
     private String profilePath;
     private Long receiverId;
+    private String nickname;
 
     @QueryProjection
-    public SentFriendRequestDto(Long friendRequestId,String profilePath, Long requesterId) {
+    public SentFriendRequestDto(Long friendRequestId,String profilePath, Long requesterId,String nickname) {
         this.friendRequestId = friendRequestId;
         this.profilePath = profilePath;
         this.receiverId = requesterId;
+        this.nickname = nickname;
     }
 }

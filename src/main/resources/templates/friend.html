@@ -16,102 +16,114 @@
             </div>
 
             <div id="received" class="tab-content">
-                <div class="friendRequestArea">
-                    <template id="friendRequest-template">
-                        <div class="friendReq">
+                <div class="receivedRequestArea friendRequestArea">
+                    <template id="received-friendRequest-template">
+                        <div class="friendReq" data-friendRequest-id="">
                             <div class="friendProfile">
-                                <img src="/image/basicProfile.jpg">
-                                <span class="customBoldFont custom-m-4">냠냠냠</span>
+                                <img class="profileImg" src="/image/basicProfile.jpg">
+                                <span class="customBoldFont custom-m-4 nickname">냠냠냠</span>
                             </div>
                             <div class="friendReqBtn">
-                                <button class="btn btn-primary custom-m-4">수락</button>
-                                <button class="btn btn-outline-secondary custom-m-4">거절</button>
+                                <button class="btn btn-primary custom-m-4 acceptBtn">수락</button>
+                                <button class="btn btn-outline-secondary custom-m-4 refuseBtn">거절</button>
+                            </div>
+                        </div>
+                    </template>
+
+                </div>
+                <div class="noFriendRequest" id="noReceivedRequest">
+                    <p class="customLargeBoldFont">현재 대기중인 받은 친구 요청이 없습니다.</p>
+                </div>
+            </div>
+            <div id="sent" class="tab-content" style="display: none;">
+                <div class="sentRequestArea friendRequestArea">
+                    <template id="sent-friendRequest-template">
+                        <div class="friendReq" data-friendRequest-id="">
+                            <div class="friendProfile">
+                                <img class="profileImg" src="/image/basicProfile.jpg">
+                                <span class="customBoldFont custom-m-4 nickname">냠냠냠</span>
+                            </div>
+                            <div class="friendReqBtn">
+                                <button class="btn btn-outline-secondary custom-m-4 cancelBtn">취소</button>
                             </div>
                         </div>
                     </template>
                 </div>
+                <div class="noFriendRequest" id="noSentRequest">
+                    <p class="customLargeBoldFont">현재 대기중인 보낸 친구 요청이 없습니다.</p>
+                </div>
             </div>
-            <div id="sent" class="tab-content" style="display: none;">
-                <p>여기에 보낸 친구 요청 목록을 표시합니다.</p>
-            </div>
-
-
-
-
-
-            <!--<div class="friendRequestArea">
-                <div class="friendReq">
-                    <div class="friendProfile">
-                        <img src="/image/basicProfile.jpg">
-                        <span class="customBoldFont custom-m-4">냠냠냠</span>
-                    </div>
-                    <div class="friendReqBtn">
-                        <button class="btn btn-primary custom-m-4">수락</button>
-                        <button class="btn btn-outline-secondary custom-m-4">거절</button>
-                    </div>
-                </div>
-                <div class="friendReq">
-                    <div class="friendProfile">
-                        <img src="/image/basicProfile.jpg">
-                        <span class="customBoldFont custom-m-4">냠냠냠</span>
-                    </div>
-                    <div class="friendReqBtn">
-                        <button class="btn btn-primary custom-m-4">수락</button>
-                        <button class="btn btn-outline-secondary custom-m-4">거절</button>
-                    </div>
-                </div>
-                <div class="friendReq">
-                    <div class="friendProfile">
-                        <img src="/image/basicProfile.jpg">
-                        <span class="customBoldFont custom-m-4">냠냠냠</span>
-                    </div>
-                    <div class="friendReqBtn">
-                        <button class="btn btn-primary custom-m-4">수락</button>
-                        <button class="btn btn-outline-secondary custom-m-4">거절</button>
-                    </div>
-                </div>
-                <div class="friendReq">
-                    <div class="friendProfile">
-                        <img src="/image/basicProfile.jpg">
-                        <span class="customBoldFont custom-m-4">냠냠냠</span>
-                    </div>
-                    <div class="friendReqBtn">
-                        <button class="btn btn-primary custom-m-4">수락</button>
-                        <button class="btn btn-outline-secondary custom-m-4">거절</button>
-                    </div>
-                </div>
-                <div class="friendReq">
-                    <div class="friendProfile">
-                        <img class="friendReqProfile" src="/image/basicProfile.jpg">
-                        <span class="customBoldFont custom-m-4 friendReqName">냠냠냠</span>
-                    </div>
-                    <div class="friendReqBtn">
-                        <button class="btn btn-primary custom-m-4">수락</button>
-                        <button class="btn btn-outline-secondary custom-m-4">거절</button>
-                    </div>
-                </div>
-                <div class="friendReq">
-                    <div class="friendProfile">
-                        <img src="/image/basicProfile.jpg">
-                        <span class="customBoldFont custom-m-4">냠냠냠</span>
-                    </div>
-                    <div class="friendReqBtn">
-                        <button class="btn btn-primary custom-m-4">수락</button>
-                        <button class="btn btn-outline-secondary custom-m-4">거절</button>
-                    </div>
-                </div>
-            </div>-->
         </div>
     </main>
 </div>
 <th:block layout:fragment="script">
     <script>
+        window.addEventListener('load', async function (){
+            let receivedRequests = await receivedRequestAPI();
+            if(receivedRequests  && receivedRequests.length > 0){
+                renderReceivedRequest(receivedRequests);
+            }
+            let sentRequests = await sentRequestAPI();
+            if(sentRequests  && sentRequests.length > 0){
+                renderSentRequest(sentRequests);
+            }
+        });
+
+        const receivedContainer = document.querySelector('.receivedRequestArea');
+        const sentContainer = document.querySelector('.sentRequestArea');
+
+        receivedContainer.addEventListener('click', async function(event){
+            if (event.target.classList.contains('acceptBtn')) {
+                let friendRequest = event.target.closest('.friendReq');
+                let FRID = friendRequest.getAttribute('data-friendRequest-id');
+                let result = await friendRequestRefuse(FRID);
+                if(result){
+                    friendRequest.remove();
+                }
+                let hasfriendReq = receivedContainer.querySelector('.friendReq') !== null;
+                if(!hasfriendReq){
+                    document.getElementById('received').style.removeProperty("height");
+                    document.getElementById('noReceivedRequest').style.display = 'flex';
+                }
+            }
+
+            if (event.target.classList.contains('refuseBtn')) {
+                let friendRequest = event.target.closest('.friendReq');
+                let FRID = friendRequest.getAttribute('data-friendRequest-id');
+                let result = await friendRequestRefuse(FRID);
+                if(result){
+                    friendRequest.remove();
+                }
+                let hasfriendReq = receivedContainer.querySelector('.friendReq') !== null;
+                if(!hasfriendReq){
+                    document.getElementById('received').style.removeProperty("height");
+                    document.getElementById('noReceivedRequest').style.display = 'flex';
+                }
+            }
+        });
+
+
+        sentContainer.addEventListener('click', async function(event){
+            if (event.target.classList.contains('cancelBtn')) {
+                let friendRequest = event.target.closest('.friendReq');
+                let FRID = friendRequest.getAttribute('data-friendRequest-id');
+                let result = await friendRequestRefuse(FRID);
+                if(result){
+                    friendRequest.remove();
+                }
+                let hasfriendReq = sentContainer.querySelector('.friendReq') !== null;
+                if(!hasfriendReq){
+                    document.getElementById('sent').style.removeProperty("height");
+                    document.getElementById('noSentRequest').style.display = 'flex';
+                }
+            }
+        });
+
         function showTab(tabId) {
         // 모든 탭 숨김
-        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
         // 선택된 탭만 표시
-        document.getElementById(tabId).style.display = 'block';
+            document.getElementById(tabId).style.display = 'block';
         }
     </script>
 </th:block>

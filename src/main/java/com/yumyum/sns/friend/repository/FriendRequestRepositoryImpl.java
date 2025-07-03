@@ -31,7 +31,8 @@ public class FriendRequestRepositoryImpl implements FriendRequestRepositoryCusto
                         new QReceivedFriendRequestDto(
                                 friendRequest.id,
                                 friendRequest.requester.profileImage,
-                                friendRequest.requester.id
+                                friendRequest.requester.id,
+                                friendRequest.requester.nickname
                         )
                 )
                 .from(friendRequest)
@@ -50,7 +51,8 @@ public class FriendRequestRepositoryImpl implements FriendRequestRepositoryCusto
                         new QSentFriendRequestDto(
                                 friendRequest.id,
                                 friendRequest.receiver.profileImage,
-                                friendRequest.receiver.id
+                                friendRequest.receiver.id,
+                                friendRequest.receiver.nickname
                         )
                 )
                 .from(friendRequest)
