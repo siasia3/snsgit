@@ -24,6 +24,46 @@ document.getElementById('postDetailModal').addEventListener('click', async(event
     }
 });
 
+//좋아요한 게시글 조회
+async function likesPosts(cursor,pageSize){
+    const options = {
+        method: 'GET'
+    };
+
+    if(cursor){
+        const response = await fetchWithAuth(`/api/user/liked-posts?cursor=${cursor}&pageSize=${pageSize}`,options);
+        let likePosts = await response.json();
+        return likePosts;
+    }else if(!cursor){
+        const response = await fetchWithAuth(`/api/user/liked-posts?pageSize=${pageSize}`,options);
+        let likePosts = await response.json();
+        return likePosts;
+    }
+
+
+
+}
+
+//좋아요 게시글 렌더링
+function renderLikesPosts(likePosts){
+    let likePostArea = document.getElementById('likePostInner');
+    let thumbnailTemplate = document.getElementById('likePost-thumbnail-template');
+    if(!likePosts.content || likePosts.content.length === 0){
+        likePostArea.style.justifyContent = 'center';
+        let noPost = document.getElementById('no-likePost-template').content.cloneNode(true);
+        likePostArea.appendChild(noPost);
+    }
+    likePosts.content.forEach((likePost)=>{
+        let postThumbnail = thumbnailTemplate.content.cloneNode(true);
+        postThumbnail.querySelector('.memberPost').setAttribute('data-post-id',likePost.postId);
+        postThumbnail.querySelector('.likePost').setAttribute('data-like-id',likePost.likeId);
+        renderMediaElementByExtension(likePost.thumbnailPath,postThumbnail);
+        postThumbnail.querySelector('.likeCnt').textContent = likePost.likeCount;
+        postThumbnail.querySelector('.commentCnt').textContent = likePost.commentCount;
+        likePostArea.appendChild(postThumbnail);
+    });
+}
+
 
 //좋아요 Insert API
 async function likeIncreaseAPI(targetPost) {
@@ -47,7 +87,10 @@ async function likeIncreaseAPI(targetPost) {
         return likeId;
     } catch (error) {
         console.error('오류 발생:', error);
-        alert('오류가 발생했습니다.');
+        console.log(error.status);
+        if(error.status!=401) {
+            alert('잠시 후 다시 시도해주세요.');
+        }
     }
 
 }

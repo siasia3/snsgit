@@ -16,10 +16,12 @@ public class CommentResponseDto {
     private String commentContent;
     private String authorProfileImage;
     private Long parentId;
+    private Long authorId;
 
     public CommentResponseDto(Member author, Comment comment) {
         this.commentAuthor = author.getName();
         this.authorProfileImage = author.getProfileImage();
+        this.authorId = author.getId();
         this.commentContent = comment.getContent();
         this.commentId = comment.getId();
         if(comment.getParent() != null) {

@@ -42,8 +42,25 @@ public class TagServiceImpl implements TagService{
         return null;
     }
 
+    //게시글 태그 삭제
     @Override
-    public void deleteTag(Long tagId) {
-
+    public void deleteTagByPostId(Long postId) {
+        List<PostTag> tags = postTagRepository.findByPostId(postId);
+        if(!tags.isEmpty()){
+            for(PostTag postTag : tags){
+                postTagRepository.delete(postTag);
+            }
+        }
     }
+
+    @Override
+    public PostTag updateTag(TagDto tagDto, Post post) {
+        //기존 태그 삭제
+        deleteTagByPostId(post.getId());
+        //태그 create
+        PostTag tag = createTag(tagDto, post);
+        return tag;
+    }
+
+
 }

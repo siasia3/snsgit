@@ -2,10 +2,18 @@ function connect(chatroomId) {
 
     let socket = new SockJS("/ws-chat");
     stompClient = Stomp.over(socket);
-    stompClient.connect({}, () => onConnected(chatroomId), onError);
+    stompClient.connect({}, () => onConnected(chatroomId), onError(chatroomId));
+
+    socket.onclose = (event) => {
+        if (!event.wasClean) {
+            console.log("비정상 종료 발생, 재연결 시도");
+            setTimeout(() => connect(chatroomId), 2000);
+        }
+    };
 
 }
 
+let reconnectDelay = 2000;
 function onConnected(chatroomId) {
     // Subscribe to the Public Topic
     stompClient.subscribe(`/sub/chat/room/${chatroomId}`, function(onMessageReceived){
@@ -17,14 +25,17 @@ function onConnected(chatroomId) {
         alert("잠시 후 다시 시도해주세요.");
     });
 
+
+
 }
 
 function sendMessage(message){
     stompClient.send("/pub/chat/send", {}, message);
 }
 
-function onError(error) {
-    console.error('❌ 연결 실패:', error);
+function onError(chatroomId) {
+    console.error('❌ 연결 실패 또는 끊김: 재연결 시도중');
+    setTimeout(() => connect(chatroomId), reconnectDelay);
     /*connectingElement.textContent = 'Could not connect to WebSocket server. Please refresh this page to try again!';
     connectingElement.style.color = 'red';*/
 }

@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.InputStream;
 
 @SpringBootTest
-class OciStorageServiceTest {
+class OciS3StorageServiceTest {
 
 
     @Autowired

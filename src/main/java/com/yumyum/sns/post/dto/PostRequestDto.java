@@ -21,5 +21,4 @@ public class PostRequestDto {
     private int likeCount;
     private String postContent;
     private List<TagDto> hashtags;
-
 }

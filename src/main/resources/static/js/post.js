@@ -1,9 +1,21 @@
 //게시글 등록 파일 미리보기
 document.getElementById('fileInput').addEventListener('change', (event) => {
+    let modal = document.getElementById('writeModal');
     const files = event.target.files;
-    const carouselItems = document.getElementById('carouselItems');
-    const prevButton = document.getElementById('prevButton');
-    const nextButton = document.getElementById('nextButton');
+    renderFilePreview(modal,files);
+});
+
+document.getElementById('modifyFileInput').addEventListener('change', (event) => {
+    let modal = document.getElementById('modifyModal');
+    const files = event.target.files;
+    renderFilePreview(modal,files);
+});
+
+//파일 미리보기 렌더링
+function renderFilePreview(modal,files){
+    const carouselItems = modal.querySelector('.carouselItems');
+    const prevButton = modal.querySelector('.prevButton');
+    const nextButton = modal.querySelector('.nextButton');
 
     carouselItems.innerHTML = ''; // 기존 아이템 초기화
 
@@ -50,7 +62,7 @@ document.getElementById('fileInput').addEventListener('change', (event) => {
         }
         carouselItems.appendChild(carouselItem);
     });
-});
+}
 
 //게시글 등록 클릭
 document.getElementById('postBtn').addEventListener('click', async (event) => {
@@ -77,12 +89,11 @@ document.getElementById('postBtn').addEventListener('click', async (event) => {
             body: formData
         };
 
-
         const result = await fetchWithAuth('/api/post',options);
-        console.log('게시글 업로드 성공:', result);
+        console.log('게시글 등록 성공:', result);
         document.getElementById('writeModal').classList.remove('show');
-        resetWriteModal();
-        alert('게시물이 성공적으로 업로드되었습니다.');
+        resetModifyModal();
+        alert('게시물이 성공적으로 등록되었습니다.');
 
 
     } catch (error) {
@@ -90,6 +101,75 @@ document.getElementById('postBtn').addEventListener('click', async (event) => {
         alert('오류가 발생했습니다.');
     }
 });
+
+//게시글 수정 클릭
+document.getElementById('updateBtn').addEventListener('click', async (event) => {
+    const postId = document.getElementById('modifyPostId').getAttribute('data-post-id');
+    const attachId = document.getElementById('attachmentId').getAttribute('data-attach-id');
+    const formData = new FormData();
+    const postContent = document.getElementById('modifyPostContent').value;
+    const files = document.getElementById('modifyFileInput').files;
+    const hashtags = postContent.match(/#[^\s#]+/g) || [];
+    const hashtagObjects = hashtags.map(tag => ({ content: tag.slice(1) }));
+
+    const data = {
+        postId: postId,
+        attachmentId: attachId,
+        postContent: postContent,
+        hashtags : hashtagObjects
+    }
+
+    formData.append('post',new Blob([JSON.stringify(data)],{type: "application/json"}));
+    Array.from(files).forEach((file) => {
+        formData.append('files', file);
+    });
+
+    let result = await updatePost(formData,postId);
+    if(result.success) {
+        document.getElementById('modifyModal').classList.remove('show');
+        resetModifyModal();
+        alert('게시물이 성공적으로 수정되었습니다.');
+    }
+});
+
+//게시글 삭제 버튼 클릭
+
+
+
+//게시글 수정 API
+async function updatePost(formData,postId){
+
+    try {
+        const options = {
+            method: 'PATCH',
+            body: formData
+        };
+
+        const result = await fetchWithAuth(`/api/post/${postId}`,options);
+        return await result.json();
+
+    } catch (error) {
+        console.error('오류 발생:', error);
+        alert('잠시 후 다시 시도해주세요.');
+    }
+
+}
+
+//게시글 삭제 API
+async function deletePost(postId){
+    try {
+        const options = {
+            method: 'DELETE'
+        };
+
+        const result = await fetchWithAuth(`/api/post/${postId}`,options);
+        return await result.json();
+
+    } catch (error) {
+        console.error('오류 발생:', error);
+        alert('잠시 후 다시 시도해주세요.');
+    }
+}
 
 
 
@@ -122,6 +202,69 @@ async function getPostDetail(postId){
     };
     let response = await fetchWithAuth('/api/post/'+postId,options);
     return await response.json();
+}
+
+//수정할 게시글 데이터 조회 API
+
+async function getPost(postId){
+    const options = {
+        method: 'GET'
+    };
+    let response = await fetchWithAuth('/api/user/post/'+postId,options);
+    return await response.json();
+}
+
+
+//게시글 수정 페이지 렌더링
+function renderBeforePostUpdate(post){
+    let modal = document.getElementById('modifyModal');
+    document.getElementById('modifyPostId').setAttribute('data-post-id',post.postId);
+    document.getElementById('modifyPostContent').value = post.postContent;
+    const carouselItems = modal.querySelector('.carouselItems');
+    const prevButton = modal.querySelector('.prevButton');
+    const nextButton = modal.querySelector('.nextButton');
+
+    carouselItems.innerHTML = ''; // 기존 아이템 초기화
+
+    if (post.attachments.length > 1) {
+        // 파일 개수에 따라 버튼 활성화
+        prevButton.style.display = 'block';
+        nextButton.style.display = 'block';
+    } else {
+        // 파일이 없으면 버튼 숨김
+        prevButton.style.display = 'none';
+        nextButton.style.display = 'none';
+    }
+    post.attachments.forEach((file, index) => {
+        if(index == 0){
+            document.getElementById('attachmentId').setAttribute('data-attach-id',file.attachmentId);
+        }
+        const fileType = file.type;
+        const carouselItem = document.createElement('div');
+        carouselItem.className = `carousel-item ${index === 0 ? 'active' : ''}`; // 첫 번째 파일은 active 클래스 추가
+
+        if (fileType.startsWith('image/')) {
+            // 이미지 파일 미리보기
+            const img = document.createElement('img');
+
+            img.src = file.path;
+            img.className = 'd-block w-100';
+            img.style.objectFit = 'cover';
+            carouselItem.appendChild(img);
+
+        } else if (fileType.startsWith('video/')) {
+            // 동영상 파일 미리보기
+            const video = document.createElement('video');
+
+            video.src = file.path;
+            video.className = 'd-block w-100';
+            video.style.objectFit = 'cover';
+            video.controls = true;
+            carouselItem.appendChild(video);
+        }
+        carouselItems.appendChild(carouselItem);
+    });
+
 }
 
 //게시판 세부사항 생성
@@ -185,10 +328,15 @@ function renderPosts(data){
     const mainDiv = document.getElementById('mainDiv-inner');
     const multiFileTemplate = document.getElementById('multi-file-template');
     const singleFileTemplate = document.getElementById('single-file-template');
+    const userId = sessionStorage.getItem('userId');
     data.content.forEach(post => {
         if(post.attachments.length > 1) {
             const cloneMultiPost = multiFileTemplate.content.cloneNode(true);
             let targetPostId = 'carouselIndicators'+post.postId;
+
+            if(userId == post.memberId) {
+                cloneMultiPost.querySelector('.moreBtn').style.display = 'flex';
+            }
 
             //캐러셀별로 고유값인 게시판 키값을 이용해서 작동하게 id값 세팅
             cloneMultiPost.querySelector('.slide').setAttribute('id',targetPostId);
@@ -237,6 +385,10 @@ function renderPosts(data){
             const cloneSinglePost = singleFileTemplate.content.cloneNode(true);
             const mediaItem = cloneSinglePost.querySelector('.mediaDiv');
             mediaItem.replaceChildren();  // 자식 요소가 있으면 제거
+
+            if(userId == post.memberId) {
+                cloneSinglePost.querySelector('.moreBtn').style.display = 'flex';
+            }
 
             post.attachments.forEach(attach => {
                 if(attach.type.includes('video')){
@@ -347,29 +499,24 @@ function createPostInfo(template,post){
 
 //게시글 등록시 글 등록 modal 비워주는 함수
 function resetWriteModal(){
+    let modal = document.getElementById('writeModal');
     document.getElementById('postContent').value = "";
     document.getElementById('fileInput').value = "";
-    document.getElementById('carouselItems').replaceChildren();
-    document.getElementById('prevButton').style.display = 'none';
-    document.getElementById('nextButton').style.display = 'none';
+    modal.querySelector('.carouselItems').replaceChildren();
+    modal.querySelector('.prevButton').style.display = 'none';
+    modal.querySelector('.nextButton').style.display = 'none';
 }
 
-/*//스크롤시 post 페이징 api 불러오기
-window.addEventListener("scroll", () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-        pagingPosts();
-    }
-});
-
-//load될때 post 페이징 api로 불러오기
-window.addEventListener("load", () => {
-    pagingPosts();
-});*/
-
-
-
-if (window.location.pathname === "/main") {
-
-    // 페이지 로드 시 post 페이징 API 호출
-
+//게시글 수정시 글 수정 modal 비워주는 함수
+function resetModifyModal(){
+    let modal = document.getElementById('modifyModal');
+    document.getElementById('modifyPostId').removeAttribute('data-post-id');
+    document.getElementById('modifyPostContent').value = "";
+    document.getElementById('modifyFileInput').value = "";
+    modal.querySelector('.carouselItems').replaceChildren();
+    modal.querySelector('.prevButton').style.display = 'none';
+    modal.querySelector('.nextButton').style.display = 'none';
 }
+
+
+

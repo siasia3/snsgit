@@ -6,7 +6,7 @@ build/
 !**/src/test/**/build/
 application.yml
 **/META-INF/MANIFEST.MF
-
+/src/main/resources/keys/
 
 ### STS ###
 .apt_generated

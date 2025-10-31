@@ -1,10 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
 <body>
-$END$
+    <div layout:decorate="layout.html">
+        <main layout:fragment="content">
+            <div id="userDiv" class="w-100">
+                <div id="userDiv-inner" class="w-100">
+                    <div class="userPostArea">
+
+                        <div class="dividerContainer">
+                            <div class="profileDivider"></div>
+                        </div>
+                        <div class="userPostArea-header small-pb-custom">
+                            <i class="fa-regular fa-clipboard"></i>
+                            <span class="small-pl-custom customBoldFont">좋아요 게시물</span>
+                        </div>
+                        <div class="userPostArea-content">
+                            <div id="likePostInner" class="userPostArea-inner">
+                                <template id="likePost-thumbnail-template">
+                                    <div class="memberPost" data-post-id="777">
+                                        <div class="likePost" data-like-id="" style="display:none;"></div>
+                                        <img class="postMedia" src="/image/noImage.png">
+                                        <video class="postMedia" src="/image/240330_small.mp4" muted></video>
+                                        <div class="postOverlay">
+                                            <div>
+                                                <span class="icon">❤</span>
+                                                <span class="count likeCnt">12</span>
+                                                <span class="icon">💬</span>
+                                                <span class="count commentCnt">5</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template id="no-likePost-template">
+                                    <div id="noPost" style="text-align: center; color: #5f5f5f; margin-top: 20px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 24 24" fill="none">
+                                            <path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                            <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        </svg>
+                                        <p style="margin-top: 8px; font-size: 16px;">게시물이 없습니다</p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:replace="~{modal/postDetailModal :: postDetailModal}"></div>
+        </main>
+    </div>
+    <th:block layout:fragment="script">
+        <script src="/js/comment.js" defer></script>
+        <script src="/js/like.js" defer></script>
+        <script src="/js/reply.js" defer></script>
+        <script>
+
+            let cursor = null;
+            let likePostSize = 12;
+
+            window.addEventListener("load", async () => {
+                let likesPost = await likesPosts(cursor,likePostSize);
+
+                cursor = likesPost.nextCursor;
+                renderLikesPosts(likesPost);
+            });
+
+            window.addEventListener("scroll", async () => {
+                if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+                    if(cursor) {
+                        let likesPost = await likesPosts(cursor, likePostSize);
+                        renderLikesPosts(likesPost);
+                        cursor = likesPost.nextCursor;
+                    }
+                }
+            });
+
+
+        </script>
+    </th:block>
 </body>
 </html>

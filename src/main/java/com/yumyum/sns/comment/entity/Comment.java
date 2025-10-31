@@ -1,6 +1,7 @@
 package com.yumyum.sns.comment.entity;
 
 import com.yumyum.sns.comment.dto.CommentRequestDto;
+import com.yumyum.sns.common.BaseTimeEntity;
 import com.yumyum.sns.member.entity.Member;
 import com.yumyum.sns.post.entity.Post;
 import jakarta.persistence.*;
@@ -18,8 +19,7 @@ import java.util.Optional;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class Comment {
+public class Comment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,11 +39,6 @@ public class Comment {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> replyList = new ArrayList<>();
-
-
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
 
     @Column(nullable = false, length = 2000)
     private String content;

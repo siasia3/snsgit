@@ -1,7 +1,7 @@
 package com.yumyum.sns.post.dto;
 
-import com.yumyum.sns.attachment.dto.AttachDto;
 import com.yumyum.sns.attachment.dto.AttachwithDetailDto;
+import com.yumyum.sns.post.entity.Post;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,19 +12,19 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PostBeforeUpdateDTO {
+public class PostDTO {
 
     private Long postId;
-    private Long memberId;
-    private Long attachId;
     private String postContent;
     private LocalDateTime createdAt;
     private String thumbnailPath;
     private List<AttachwithDetailDto> attachments;
 
-    public PostBeforeUpdateDTO(Long postId, String postContent, List<AttachwithDetailDto> attachments) {
-        this.postId = postId;
-        this.postContent = postContent;
+    public PostDTO(Post post, List<AttachwithDetailDto> attachments) {
+        this.postId = post.getId();
+        this.postContent = post.getContent();
+        this.createdAt = post.getCreatedAt();
+        this.thumbnailPath = post.getThumbnailPath();
         this.attachments = attachments;
     }
 }

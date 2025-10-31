@@ -42,7 +42,7 @@ public class SecurityConfig {
 
         //경로별 인가 작업
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/start", "/resources/**").permitAll()
+                .requestMatchers("/start", "/resources/**","/auth/refresh").permitAll()
                 .anyRequest().authenticated());
 
         //Form 로그인 방식

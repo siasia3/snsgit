@@ -20,6 +20,7 @@ public class LikesServiceImpl implements LikesService {
     private final MemberService memberService;
     private final PostService postService;
 
+    //좋아요 추가
     @Override
     public Long createLike(LikeDto likeDto, String identifier) {
         Member checkMember = memberService.getMemberByIdentifier(identifier);
@@ -28,6 +29,7 @@ public class LikesServiceImpl implements LikesService {
         return savedLike.getId();
     }
 
+    //좋아요 삭제
     @Override
     public void deleteLike(Long likeId) {
         Likes like = likesRepository.findById(likeId).orElseThrow(() -> new LikeNotFoundException(likeId));

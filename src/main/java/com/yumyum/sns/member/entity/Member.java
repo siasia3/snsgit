@@ -92,8 +92,8 @@ public class Member {
         this.role = role;
     }
 
-    //이름과 이메일값이 바꾸었는지 확인하는 생성자
-    public void checkPersonalInfo(String name, String email) {
+    //이름과 이메일값이 바뀌었으면 세팅
+    public void modifyPersonalInfo(String name, String email) {
         this.name = name;
         this.email = email;
     }

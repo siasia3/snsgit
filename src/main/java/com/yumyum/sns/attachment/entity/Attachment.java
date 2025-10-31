@@ -1,5 +1,6 @@
 package com.yumyum.sns.attachment.entity;
 
+import com.yumyum.sns.common.BaseTimeEntity;
 import com.yumyum.sns.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,23 +13,15 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Attachment {
+public class Attachment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "attachment")
     private List<AttachmentDetail> attachments = new ArrayList<>();
 
     @OneToOne(mappedBy = "attachment", fetch = FetchType.LAZY)
     private Post post;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now(); // 현재 시간을 설정
-    }
 
 }

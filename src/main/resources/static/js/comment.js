@@ -14,7 +14,7 @@ document.getElementById('postDetailModal').addEventListener('input', function (e
     }
 });
 
-document.getElementById('postDetailModal').addEventListener('click', function (event){
+document.getElementById('postDetailModal').addEventListener('click', async function (event){
     //게시판 상세조회 답글달기 클릭 이벤트
     if(event.target && event.target.classList.contains('comment-content')){
         let commentPostBtn = event.target.nextElementSibling;
@@ -24,6 +24,46 @@ document.getElementById('postDetailModal').addEventListener('click', function (e
             commentPostBtn.style.display = 'none'; // 버튼 비활성화
         }
     }
+
+    // 댓글 삭제 클릭
+    if (event.target && event.target.classList.contains('commentRemove')){
+        const targetComment = event.target.closest('.comment');
+        let commentId = targetComment.getAttribute("data-comment-id");
+
+        // SweetAlert2로 확인창 표시
+        const result = await Swal.fire({
+            title: '정말 삭제하시겠습니까?',
+            text: '삭제 후에는 복구할 수 없습니다.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소'
+        });
+
+        // 확인 눌렀을 때만 실행
+        if (result.isConfirmed) {
+            try {
+                let result = await deleteComment(commentId);
+                if(result.message=="ok"){
+                    //댓글 요소 삭제
+                    targetComment.remove();
+                }
+
+
+            } catch (error) {
+                console.error(error);
+                /*Swal.fire({
+                    title: '오류 발생',
+                    text: '댓글 삭제 중 문제가 발생했습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인'
+                });*/
+            }
+        }
+    }
+
 
     if (event.target && event.target.classList.contains('commentPostBtn')){
         //상세조회 댓글 등록
@@ -42,7 +82,26 @@ document.getElementById('postDetailModal').addEventListener('click', function (e
                 parentId: parentId
             }
         }
-        createComment(data).then(result => renderComment(result));
+        createComment(data).then(result => {
+            if (result.parentId) {
+                //대댓글 렌더링
+                let commentInner = document.getElementById('comment-inner');
+                let parentComment = commentInner.querySelector(`[data-comment-id="${result.parentId}"]`);
+                let replyInner = parentComment.querySelector('.replyInner');
+                const reply = [result];
+                renderReply(reply,replyInner);
+                if(replyInner.style.display === 'none'){
+                    let replyCnt = replyInner.closest('.reply-area').querySelector('.replyCount');
+                    let cnt = parseInt(replyCnt.textContent, 10) || 0;
+                    cnt++;
+                    replyCnt.textContent = cnt;
+                }
+
+            } else {
+                //댓글 렌더링
+                renderComment(result);
+            }
+        });
         targetPost.querySelector('.comment-content').value = '';
     }
 
@@ -92,6 +151,33 @@ async function createComment(comment){
         return responseData;
 }
 
+//댓글 삭제 API
+async function deleteComment(commentId){
+
+    const options = {
+        method: 'delete'
+    };
+
+    try {
+        const response = await fetchWithAuth(`/api/comment/${commentId}`, options);
+
+        if (response.status == 200) {
+            const responseData = await response.json();
+            return responseData;
+        }
+    }catch(error){
+        if(error.status == 400){
+            alert("삭제권한이 없습니다");
+        }else{
+            alert("잠시 후 다시 시도해주세요.");
+        }
+    }
+}
+
+//댓글 삭제 성공 시 해당 요소 삭제
+
+
+
 //게시판 댓글 페이징 조회 API
 async function getComments(postId,size,page){
 
@@ -115,10 +201,7 @@ function renderComment(comment){
     commentClone.querySelector('.commentAuthor').innerText = comment.commentAuthor;
     commentClone.querySelector('.commentContent').insertAdjacentHTML('beforeend', comment.commentContent);
     postCommentArea.insertBefore(commentClone,siblingComment);
-
 }
-
-
 
 //상세조회시 여러개의 댓글 렌더링
 function renderCommentElements(commentDatas){

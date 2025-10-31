@@ -24,7 +24,7 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.startsWith("/start") || path.startsWith("/public");
+        return path.startsWith("/start") || path.startsWith("/public") || path.startsWith("/auth/refresh");
     }
 
     @Override
@@ -79,16 +79,16 @@ public class JWTFilter extends OncePerRequestFilter {
                 response.getWriter().write("{\"error\": \"token_expired\", \"message\": \"The token has expired. Please refresh your token.\"}");
                 return;
             }
-            //ssr 기반 화면요청인 경우
+            //ssr 기반 화면요청이면서 리프레쉬 만료인 경우
             if(jwtUtil.isExpired(refreshToken)){
                 response.sendRedirect("/start");
             }
 
+            //ssr 기반 화면요청이면서 리프레쉬 유효한 경우
             if(!jwtUtil.isExpired(refreshToken)){
-                String newAccessToken = jwtUtil.createJwt(jwtUtil.getUsername(refreshToken), "ROLE_USER", 60 * 60 * 60L);
+                String newAccessToken = jwtUtil.createJwt(jwtUtil.getUsername(refreshToken), "ROLE_USER", 30 * 1000L);
                 response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken));
-                filterChain.doFilter(request, response);
-                return;
+                accessToken = newAccessToken;
             }
 
         }

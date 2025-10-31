@@ -292,6 +292,13 @@ main {
     width: 100%;
 }
 
+.moreBtn{
+    display: flex;
+    justify-content: flex-end;
+    font-size: larger;
+    padding-top: 1rem;
+}
+
 /*게시글 더보기 텍스트*/
 .post-text {
     width: 86%;
@@ -640,10 +647,15 @@ span.fa-comment {
     height: 35vh;
 }
 
+#updateDynamicCarousel{
+    height: 35vh;
+}
+
+
 .contentLabel {
     margin-top: 0.5rem;
 }
-#carouselItems{
+.carouselItems{
     border: 1px solid #dee2e6;
     height: 90%;
     display: flex;

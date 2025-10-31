@@ -38,7 +38,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String accessToken = jwtUtil.createJwt(username, role, 60*60*1000L);
+        String accessToken = jwtUtil.createJwt(username, role, 30*1000L);
         String refreshToken = jwtUtil.createRefreshToken(username,3*60*60*1000L);
         tokenService.saveRefreshToken(username,refreshToken,3*60*60*1000L);
 

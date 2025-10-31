@@ -26,6 +26,8 @@ public class CommentServiceImpl implements CommentService{
     private final PostService postService;
     private final CommentRepository commentRepository;
 
+
+    //댓글 등록
     @Override
     public CommentResponseDto createComment(CommentRequestDto commentRequestDto, String identifier) {
         Member member = memberService.getMemberByIdentifier(identifier);
@@ -42,6 +44,7 @@ public class CommentServiceImpl implements CommentService{
         return new CommentResponseDto(member, savedComment);
     }
 
+    //게시글 리스트의 각 댓글개수
     @Override
     public Map<Long, CommentCntDto> getCommentCntsByPostIds(List<Long> postIds) {
         List<CommentCntDto> totalCommentCnts = commentRepository.findCommentCntsByPostIds(postIds);
@@ -49,12 +52,14 @@ public class CommentServiceImpl implements CommentService{
         return totalCommentCntMap;
     }
 
+    //특정 게시글의 댓글조회
     @Override
     public CommentSliceDto getCommentsByPost(Pageable pageable, Long postId) {
         List<CommentDto> commentsByPost = commentRepository.findCommentsByPost(pageable, postId);
         return new CommentSliceDto(commentsByPost,pageable);
     }
 
+    //댓글 삭제
     @Override
     public Long deleteComment(Long commentId, String identifier) {
         Comment comment = commentRepository.findByIdWithMember(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
@@ -66,6 +71,7 @@ public class CommentServiceImpl implements CommentService{
         return comment.getId();
     }
 
+    //대댓글 조회
     @Override
     public ReplySliceDto getRepliesByComment(Pageable pageable, Long parentId) {
         List<ReplyDto> replies = commentRepository.findRepliesByComment(pageable, parentId);

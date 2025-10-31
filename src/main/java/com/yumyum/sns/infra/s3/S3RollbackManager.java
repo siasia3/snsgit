@@ -11,7 +11,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class RollbackManager implements com.yumyum.sns.infra.RollbackManager {
+public class S3RollbackManager implements com.yumyum.sns.infra.RollbackManager {
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;

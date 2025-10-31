@@ -34,7 +34,7 @@ public class PostFacadeServiceImpl implements PostFacadeService{
 
     // 파일, 게시판, 해시태그 생성
     @Override
-    public void createPost(PostRequestDto postRequestDto, List<MultipartFile> files, String identifier) {
+    public void registerPost(PostRequestDto postRequestDto, List<MultipartFile> files, String identifier) {
         Member checkMember = memberService.getMemberByIdentifier(identifier);
         Attachment attachment = new Attachment();
         List<TagDto> hashtags = postRequestDto.getHashtags();
@@ -51,6 +51,32 @@ public class PostFacadeServiceImpl implements PostFacadeService{
             }
         }
     }
+
+    //파일,게시판,해시태그 수정
+    @Override
+    public PostUpdateResponseDTO modifyPost(PostUpdateRequestDTO postUpdateRequestDto, List<MultipartFile> files, String identifier) {
+        Member checkMember = memberService.getMemberByIdentifier(identifier);
+        List<TagDto> hashtags = postUpdateRequestDto.getHashtags();
+        Optional<ThumbnailResponse> attachment = Optional.empty();
+
+        //첨부파일 update
+        if(files != null && !files.isEmpty()){
+             attachment = Optional.of(attachmentService.updateAttachment(postUpdateRequestDto.getAttachmentId(), files));
+        }
+
+        //게시글 update
+        Post post = postService.updatePost(postUpdateRequestDto, checkMember, attachment);
+
+        //해시태그 update
+        if(hashtags != null && !hashtags.isEmpty()){
+            for(TagDto hashtag : hashtags){
+                tagService.updateTag(hashtag,post);
+            }
+        }
+
+        return new PostUpdateResponseDTO(post);
+    }
+
 
     //게시글 과 게시글 관련 정보 페이징 조회
     @Override

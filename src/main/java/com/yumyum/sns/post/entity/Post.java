@@ -2,6 +2,7 @@ package com.yumyum.sns.post.entity;
 
 import com.yumyum.sns.attachment.entity.Attachment;
 import com.yumyum.sns.comment.entity.Comment;
+import com.yumyum.sns.common.BaseTimeEntity;
 import com.yumyum.sns.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,8 +18,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class Post {
+public class Post extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,22 +28,18 @@ public class Post {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "ATTACHMENT_ID")
     private Attachment attachment;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Likes> likesList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostTag> postTags = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
-
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
 
     @Lob
     @Column(columnDefinition = "TEXT")
@@ -61,6 +57,17 @@ public class Post {
         if(attachment.getId()!=null && attachment.getId()>0){
             this.attachment = attachment;
         }
+    }
 
+    public void updateContent(String content) {
+        if (content != null && !content.isBlank()) {
+            this.content = content;
+        }
+    }
+
+    public void updateThumbnail(String thumbnailUrl) {
+        if (thumbnailUrl != null && !thumbnailUrl.isBlank()) {
+            this.thumbnailPath = thumbnailUrl;
+        }
     }
 }

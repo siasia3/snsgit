@@ -12,19 +12,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ReplyDto {
     private Long commentId;
-    private String replyAuthor;
-    private String replyContent;
-    private Long memberId;
+    private String commentAuthor;
+    private String commentContent;
+    private Long authorId;
     private String authorProfileImage;
     private LocalDateTime createdAt;
     private Long parentId;
 
     @QueryProjection
-    public ReplyDto(Long commentId, String replyAuthor, String replyContent, Long memberId, String authorProfileImage, LocalDateTime createdAt, Long parentId) {
+    public ReplyDto(Long commentId, String commentAuthor, String commentContent, Long authorId, String authorProfileImage, LocalDateTime createdAt, Long parentId) {
         this.commentId = commentId;
-        this.replyAuthor = replyAuthor;
-        this.replyContent = replyContent;
-        this.memberId = memberId;
+        this.commentAuthor = commentAuthor;
+        this.commentContent = commentContent;
+        this.authorId = authorId;
         this.authorProfileImage = authorProfileImage;
         this.createdAt = createdAt;
         this.parentId = parentId;

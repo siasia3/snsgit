@@ -11,9 +11,20 @@
                     <div class="post" data-post-id="777">
                         <div class="postInfo">
                             <div class="profile-div">
-                                <img src="image/basicProfile.jpg" class="profile-img">
+                                <img src="/image/basicProfile.jpg" class="profile-img">
                             </div>
                             <span class="authorInfo customBoldFont">김래홍 1일</span>
+                            <div class="moreBtn"
+                                 data-bs-toggle="dropdown"
+                                 aria-expanded="false"
+                                 style="width:80%; cursor: pointer; display: none;">
+                                <i class="fa-solid fa-ellipsis"></i>
+                            </div>
+
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li><a class="dropdown-item postModify" href="#">수정</a></li>
+                                <li><a class="dropdown-item text-danger postRemove" href="#">삭제</a></li>
+                            </ul>
                         </div>
                         <div id="carouselIndicators1" class="carousel slide" data-bs-ride="carousel">
                             <div class="carousel-indicators">
@@ -78,6 +89,17 @@
                                 <img src="image/basicProfile.jpg" class="profile-img">
                             </div>
                             <span class="authorInfo customBoldFont">김래홍 1일</span>
+                            <div class="moreBtn"
+                                 data-bs-toggle="dropdown"
+                                 aria-expanded="false"
+                                 style="width:80%; cursor: pointer;">
+                                <i class="fa-solid fa-ellipsis"></i>
+                            </div>
+
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li><a class="dropdown-item postModify" href="#">수정</a></li>
+                                <li><a class="dropdown-item text-danger postRemove" href="#">삭제</a></li>
+                            </ul>
                         </div>
                         <div class="mediaDiv">
                             <div class="img-container">
@@ -119,7 +141,7 @@
             </div>
         </div>
 
-        <div th:replace="~{fragments/postDetailModal :: postDetailModal}"></div>
+        <div th:replace="~{modal/postDetailModal :: postDetailModal}"></div>
 
 
     </main>
@@ -174,6 +196,56 @@
                 let postContent = event.target.closest('.post-content');
                 postContent.classList.toggle('show-more');
                 event.target.remove();
+            }
+
+            //게시글 수정 모달 열기
+            if (event.target && event.target.classList.contains('postModify')) {
+                const targetPost = event.target.closest('.post');
+                let postId = targetPost.getAttribute('data-post-id');
+                let post = await getPost(postId);
+                renderBeforePostUpdate(post);
+                document.getElementById('modifyModal').classList.add('show');
+            }
+
+            //게시글 삭제 버튼 클릭
+            if (event.target && event.target.classList.contains('postRemove')){
+                const targetPost = event.target.closest('.post');
+                let postId = targetPost.getAttribute('data-post-id');
+
+                // SweetAlert2로 확인창 표시
+                const result = await Swal.fire({
+                    title: '정말 삭제하시겠습니까?',
+                    text: '삭제 후에는 복구할 수 없습니다.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: '삭제',
+                    cancelButtonText: '취소'
+                });
+
+                // 확인 눌렀을 때만 실행
+                if (result.isConfirmed) {
+                    try {
+                        await deletePost(postId);
+                        await Swal.fire({
+                            title: '삭제 완료!',
+                            text: '게시글이 성공적으로 삭제되었습니다.',
+                            icon: 'success',
+                            confirmButtonText: '확인'
+                        });
+                        location.reload(); // 페이지 새로고침
+                    } catch (error) {
+                        console.error(error);
+                        Swal.fire({
+                            title: '오류 발생',
+                            text: '게시글 삭제 중 문제가 발생했습니다.',
+                            icon: 'error',
+                            confirmButtonText: '확인'
+                        });
+                    }
+                }
+
             }
 
             // 댓글 등록

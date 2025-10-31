@@ -59,6 +59,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                 .join(parent.member, member)
                 .groupBy(parent.id)
                 .where(parent.post.id.eq(postId).and(parent.parent.isNull()))
+                .orderBy(comment.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -92,7 +93,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                 .join(comment.member, member)
                 .join(comment.parent, parentComment)
                 .where(comment.parent.id.eq(parentId))
-                .orderBy(comment.createdAt.asc())
+                .orderBy(comment.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();

@@ -4,11 +4,12 @@ import com.yumyum.sns.attachment.dto.AttachDto;
 import com.yumyum.sns.attachment.dto.AttachwithDetailDto;
 import com.yumyum.sns.attachment.dto.ThumbnailResponse;
 import com.yumyum.sns.attachment.entity.Attachment;
+import com.yumyum.sns.attachment.entity.AttachmentDetail;
 import com.yumyum.sns.attachment.repository.AttachmentDetailRepository;
 import com.yumyum.sns.attachment.repository.AttachmentRepository;
 import com.yumyum.sns.error.exception.AttachmentNotFoundException;
-import com.yumyum.sns.infra.s3.S3RollbackManager;
-import com.yumyum.sns.infra.s3.S3Service;
+import com.yumyum.sns.infra.RollbackManager;
+import com.yumyum.sns.infra.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +24,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AttachmentServiceImpl implements AttachmentService {
 
-    private final S3RollbackManager s3RollbackManager;
-    private final S3Service s3Service;
+    private final RollbackManager rollbackManager;
+    private final StorageService storageService;
     private final AttachmentRepository attachmentRepository;
     private final AttachmentDetailRepository attachmentDetailRepository;
 
@@ -32,19 +33,22 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public ThumbnailResponse createAttachment(List<MultipartFile> files) {
 
-        List<AttachDto> attachDtos = s3Service.uploadFiles(files);
-        //롤백시 s3 정리
-        s3RollbackManager.deleteIfTransactionRollback(s3Service.toSavedFileNames(attachDtos));
+        //storage 업로드
+        List<AttachDto> attachDtos = storageService.uploadFiles(files);
+        //롤백시 storage 정리
+        rollbackManager.deleteIfTransactionRollback(storageService.toSavedFileNames(attachDtos));
 
         Attachment attach = attachmentRepository.save(new Attachment());
         for (AttachDto attachDto : attachDtos) {
-            attachmentDetailRepository.save(attachDto.toDto(attach));
+            attachmentDetailRepository.save(attachDto.toEntity(attach));
         }
 
         return new ThumbnailResponse(attach, attachDtos.get(0).getPath());
 
     }
 
+
+    //게시글 목록 조회시 첨부파일 가져오기
     @Override
     @Transactional(readOnly = true)
     public Map<Long, List<AttachDto>> getAttachmentsByPost(List<Long> attachIds) {
@@ -54,17 +58,52 @@ public class AttachmentServiceImpl implements AttachmentService {
         return attachListMap;
     }
 
+    //게시글 상세 조회시 첨부파일 가져오기
     @Override
     @Transactional(readOnly = true)
     public List<AttachwithDetailDto> getAttachmentByPostDetail(Long postId) {
         List<AttachwithDetailDto> attachment = attachmentRepository.findAttachmentByPostDetail(postId);
         if (attachment.isEmpty()) {
-            throw new AttachmentNotFoundException(postId);
+            throw new AttachmentNotFoundException("해당 게시글의 첨부파일을 조회하지 못했습니다.");
         }
         return attachment;
     }
 
+    //첨부파일 상세 삭제
+    @Override
+    public void deleteAttachmentDetail(Long attachmentId) {
+        List<AttachmentDetail> attachments = attachmentDetailRepository.findByAttachmentId(attachmentId);
+        if(attachments.isEmpty()){
+            throw new AttachmentNotFoundException("잘못된 첨부파일 ID: " + attachmentId);
+        }
 
+        for (AttachmentDetail attachment : attachments) {
+            storageService.deleteFile(attachment.getSavedFileName());
+            attachmentDetailRepository.delete(attachment);
+        }
+    }
+
+    @Override
+    public ThumbnailResponse updateAttachment(Long attachmentId, List<MultipartFile> files) {
+
+        //storage 업로드
+        List<AttachDto> attachDtos = storageService.uploadFiles(files);
+        //롤백시 storage 정리
+        rollbackManager.deleteIfTransactionRollback(storageService.toSavedFileNames(attachDtos));
+
+        //삭제 후 등록하는 방식으로 수정
+        deleteAttachmentDetail(attachmentId);
+
+        Attachment attachment = attachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new AttachmentNotFoundException("잘못된 첨부파일 ID: " + attachmentId));
+
+        for (AttachDto attachDto : attachDtos) {
+            attachmentDetailRepository.save(attachDto.toEntity(attachment));
+        }
+
+        return new ThumbnailResponse(attachment, attachDtos.get(0).getPath());
+
+    }
 
 
 }

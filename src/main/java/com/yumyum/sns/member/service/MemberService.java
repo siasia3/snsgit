@@ -11,20 +11,32 @@ import java.util.Optional;
 
 public interface MemberService {
 
-    //id값으로 회원 확인
-    public Boolean checkMember(Long id);
+    /**
+     * PK로 회원 확인
+     * @param memberId 회원 PK값
+     * @return 존재하는 회원인지 여부
+     */
+    public Boolean checkMember(Long memberId);
 
-    //식별자로 회원 조회
+    /**
+     * 식별자로 회원 조회, 없는 경우 Exception
+     * @param identifier 회원 식별코드
+     * @return 조회된 회원 엔티티
+     */
     public Member getMemberByIdentifier(String identifier);
 
     /**
-     * ID로 회원 조회
+     * ID로 회원 조회, 없는 경우 Exception
      * @param memberId 회원ID
-     * @return 회원 엔티티
+     * @return 조회된 회원 엔티티
      */
     Member getMemberById(Long memberId);
 
-    //닉네임 회원 조회
+    /**
+     * 닉네임으로 회원 조회
+     * @param nickname 조회할 닉네임
+     * @return 조회된 회원
+     */
     public Member getMemberByNickname(String nickname);
 
     /**
@@ -35,18 +47,44 @@ public interface MemberService {
     public boolean checkNicknameDuplicate(String nickname);
 
     //식별자로 회원 확인
+
+    /**
+     * 식별코드로 이미 존재하는 회원인지 체크
+     * @param identifier 회원 식별코드
+     * @return 조회된 회원
+     */
     public Optional<Member> checkIdentifier(String identifier);
 
-    //소셜로그인 회원 등록
+    /**
+     * 소셜로그인 회원 등록
+     * @param member 등록할 회원 엔티티
+     * @return 등록된 회원 엔티티
+     */
     public Member createMember(Member member);
 
     //회원 수정
+
+    /**
+     * 변경된 회원 이름 또는 이메일 수정
+     * @param member 정보를 수정할 회원 엔티티
+     * @return 수정된 회원 엔티티
+     */
     public Member modifyMember(Member member);
 
-    //검색 시 회원 정보 조회
+
+    /**
+     * 닉네임 검색을 통해 간단한 회원 정보를 가져옵니다.
+     *
+     * @param nickName 회원 닉네임
+     * @return 검색된 회원 정보
+     */
     public MemberSearchDto getSearchMember(String nickName);
 
-    //회원 검색 미리보기
+    /**
+     * 회원 검색 미리보기
+     * @param keyword 입력된 검색어
+     * @return 검색된 회원들의 미리보기
+     */
     public List<NicknamePreviewDto> previewUserByNickname(String keyword);
 
     /**

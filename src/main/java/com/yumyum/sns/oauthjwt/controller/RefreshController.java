@@ -19,8 +19,8 @@ public class RefreshController {
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshAccessToken(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response){
-        if (jwtUtil.isExpired(refreshToken)) {
-            String newAccessToken = jwtUtil.createJwt(jwtUtil.getUsername(refreshToken), "ROLE_USER", 60 * 60 * 60L);
+        if (!jwtUtil.isExpired(refreshToken)) {
+            String newAccessToken = jwtUtil.createJwt(jwtUtil.getUsername(refreshToken), "ROLE_USER", 30 * 1000L);
             response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken));
             return ResponseEntity.ok(Map.of("status", "ok", "message", "Access token refreshed successfully"));
         } else {

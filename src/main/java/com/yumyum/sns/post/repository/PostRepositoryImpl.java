@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
 
+    //페이징된 게시글 조회
     @Override
     public List<PostResponseDTO> findPagingPosts(Pageable pageable,Long memberId) {
 
@@ -60,6 +62,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return postList;
     }
 
+    //게시글 상세 조회
     @Override
     public PostDetailDto findPostDetail(Long postId, Long memberId) {
         PostDetailDto postDetailDto = queryFactory
@@ -89,6 +92,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return postDetailDto;
     }
 
+    //회원이 작성한 게시글 조회
     @Override
     public List<MemberPostDto> findMemberPosts(Pageable pageable, Long memberId) {
         List<MemberPostDto> memberPosts = queryFactory
@@ -108,6 +112,33 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
         return memberPosts;
+    }
+
+    //회원이 좋아요를 누른 게시글 조회
+    @Override
+    public List<LikedPostDto> findLikedPosts(int pageSize, LocalDateTime cursorCreatedAt, Long memberId) {
+
+        List<LikedPostDto> likedPosts = queryFactory
+                .select(new QLikedPostDto(
+                        post.id,
+                        post.thumbnailPath,
+                        likes.id.countDistinct().as("likeCount"),
+                        comment.id.countDistinct().as("commentCount"),
+                        likes.createdAt
+                ))
+                .from(post)
+                .leftJoin(post.likesList, likes)
+                .leftJoin(post.commentList, comment)
+                .where(
+                    likes.member.id.eq(memberId)
+                    .and(cursorCreatedAt != null ? likes.createdAt.lt(cursorCreatedAt) : null)
+                )
+                .groupBy(post.id, likes.id)
+                .orderBy(likes.createdAt.desc())
+                .limit(pageSize)
+                .fetch();
+
+        return likedPosts;
     }
 
 

@@ -4,6 +4,7 @@ import com.yumyum.sns.attachment.dto.AttachDto;
 import com.yumyum.sns.error.exception.FileUploadException;
 import com.yumyum.sns.error.exception.S3DeleteException;
 import com.yumyum.sns.error.exception.S3UploadException;
+import com.yumyum.sns.infra.StorageService;
 import io.awspring.cloud.s3.S3Exception;
 import io.awspring.cloud.s3.S3Operations;
 import io.awspring.cloud.s3.S3Resource;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StorageService implements com.yumyum.sns.infra.StorageService {
+public class S3StorageService implements StorageService {
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;

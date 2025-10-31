@@ -80,7 +80,7 @@
                 </div>
             </div>
 
-            <div th:replace="~{fragments/postDetailModal :: postDetailModal}"></div>
+            <div th:replace="~{modal/postDetailModal :: postDetailModal}"></div>
         </main>
     </div>
 <th:block layout:fragment="script">
@@ -93,7 +93,6 @@
         let userId;
         let DMButton = document.getElementById('DMBtn');
         let myId = sessionStorage.getItem('userId');
-        let nickname;
 
         /*window.addEventListener("load", () => {
             const url = window.location.pathname;
@@ -110,14 +109,11 @@
             pagingUserPosts(nickname).then(userPost => renderUserPosts(userPost));
         });*/
 
+        const url = window.location.pathname;
+        const nicknameMatch = url.match(/\/user\/([^\/]+)/);
+        const nickname = nicknameMatch[1];
+
         window.addEventListener("load", async () => {
-            const url = window.location.pathname;
-            const nicknameMatch = url.match(/\/user\/([^\/]+)/);
-            nickname = nicknameMatch[1];
-
-            let friends = await getFriends();
-            renderFriendList(friends);
-
             let userData = await loadUserInfo(nickname);
             friendMemId = userData.memberId;
             renderUserInfo(userData);
@@ -125,6 +121,13 @@
             renderFriendRequestByUser(friendRequestState);
             let userPost = await pagingUserPosts(nickname);
             renderUserPosts(userPost);
+        });
+
+        window.addEventListener("scroll", async () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+                let likesPost = await pagingUserPosts(nickname);
+                renderUserPosts(userPost);
+            }
         });
 
         if(DMButton){
@@ -136,8 +139,6 @@
                     chatroomId = chatroom.chatroomId;
                     window.location.href = `${BASE_URL}/chat/${nickname}?chatroomId=${chatroomId}`;
                 });
-
-
             });
         }
 

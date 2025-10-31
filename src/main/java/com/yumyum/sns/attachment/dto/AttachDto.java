@@ -35,7 +35,7 @@ public class AttachDto {
         this.type = file.getContentType();
     }
 
-    public AttachmentDetail toDto(Attachment attachment) {
+    public AttachmentDetail toEntity(Attachment attachment) {
         return AttachmentDetail.builder()
                 .originalFileName(this.originalFileName)
                 .savedFileName(this.savedFileName)

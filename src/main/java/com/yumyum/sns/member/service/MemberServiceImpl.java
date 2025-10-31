@@ -1,7 +1,7 @@
 package com.yumyum.sns.member.service;
 
 import com.yumyum.sns.error.exception.MemberNotFoundException;
-import com.yumyum.sns.infra.s3.S3Service;
+import com.yumyum.sns.infra.s3.S3StorageService;
 import com.yumyum.sns.member.dto.*;
 import com.yumyum.sns.member.entity.Member;
 import com.yumyum.sns.member.repository.MemberRepository;
@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 public class MemberServiceImpl implements MemberService{
 
     private final MemberRepository memberRepository;
-    private final S3Service s3Service;
+    private final S3StorageService s3StorageService;
 
     //id값으로 회원 확인
     @Override
-    public Boolean checkMember(Long id) {
-        return memberRepository.findById(id).isPresent();
+    public Boolean checkMember(Long memberId) {
+        return memberRepository.findById(memberId).isPresent();
     }
 
     //식별자로 회원 조회
@@ -69,17 +69,14 @@ public class MemberServiceImpl implements MemberService{
         return memberRepository.save(member);
     }
 
-    /**
-     * 닉네임 검색을 통해 간단한 회원 정보를 가져옵니다.
-     *
-     * @param nickName 회원 닉네임
-     * @return 검색된 회원 정보
-     */
+
+    //닉네임 검색 시 회원 정보 조회
     @Override
     public MemberSearchDto getSearchMember(String nickName) {
         return memberRepository.findMemberSearch(nickName).orElseThrow(()-> new MemberNotFoundException(nickName + " 닉네임을 가진 회원이 존재하지 않습니다."));
     }
 
+    //닉네임을 통해 회원 미리보기 조회
     @Override
     public List<NicknamePreviewDto> previewUserByNickname(String keyword) {
         List<Member> previewMembers = memberRepository.getPreviewByNickname(keyword);
@@ -103,7 +100,7 @@ public class MemberServiceImpl implements MemberService{
         MultipartFile profileFile = memberEditDto.getMemberProfileFile();
         if(profileFile != null && !profileFile.isEmpty()) {
             if(profileFile.getContentType().startsWith("image/")) {
-                String savedProfilePath = s3Service.uploadFile(memberEditDto.getMemberProfileFile());
+                String savedProfilePath = s3StorageService.uploadFile(memberEditDto.getMemberProfileFile());
                 memberEditDto.setMemberProfilePath(savedProfilePath);
             }else{
                 //파일이 존재하는데 이미지 파일이 아니라면 예외
