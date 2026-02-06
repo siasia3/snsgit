@@ -80,9 +80,9 @@ public class PostFacadeServiceImpl implements PostFacadeService{
 
     //게시글 과 게시글 관련 정보 페이징 조회
     @Override
-    public PostSliceDto getPostsWithInfo(Pageable pageable, Long memberId) {
+    public PostSliceDto getPostsWithInfo(PostCursorRequest cursor, Long memberId) {
         //toOne 관계 페이징조회
-        List<PostResponseDTO> pagingPosts = postService.getPagingPosts(pageable, memberId);
+        List<PostResponseDTO> pagingPosts = postService.getPagingPosts(cursor, memberId);
 
         // 1:N관계를 처리하기 위해 키값을 뽑아서 리스트 변환 -> 뽑은 키 값을 통해서 조회해서 N관계를 리스트 반환
         //List<Long> postIds = pagingPosts.stream().map(o -> o.getPostId()).toList();
@@ -107,7 +107,7 @@ public class PostFacadeServiceImpl implements PostFacadeService{
         }).collect(Collectors.toList());
 
         //hasNext값을 넣어주기 위해서 DTO로 감싸 넣어줌
-        return new PostSliceDto(postListWithInfo,pageable);
+        return new PostSliceDto(postListWithInfo,cursor.getSize());
     }
 
 }

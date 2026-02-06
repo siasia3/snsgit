@@ -48,11 +48,11 @@ public interface PostService {
 
     /**
      * 게시글 페이징 조회
-     * @param pageable 페이징
+     * @param cursor cursor 페이징
      * @param memberId 좋아요 상태를 확인할 회원ID
      * @return 게시글 목록
      */
-    List<PostResponseDTO> getPagingPosts(Pageable pageable, Long memberId);
+    List<PostResponseDTO> getPagingPosts(PostCursorRequest cursor, Long memberId);
 
     /**
      * 게시글 상세 조회

@@ -1,10 +1,11 @@
-package com.yumyum.sns.oauthjwt.config;
+package com.yumyum.sns.security.config;
 
 
-import com.yumyum.sns.oauthjwt.jwt.JWTFilter;
-import com.yumyum.sns.oauthjwt.jwt.JWTUtil;
-import com.yumyum.sns.oauthjwt.oauth2.CustomSuccessHandler;
-import com.yumyum.sns.oauthjwt.service.CustomOAuth2UserService;
+import com.yumyum.sns.member.service.MemberService;
+import com.yumyum.sns.security.oauthjwt.jwt.JWTFilter;
+import com.yumyum.sns.security.oauthjwt.jwt.JWTUtil;
+import com.yumyum.sns.security.handler.LoginSuccessHandler;
+import com.yumyum.sns.security.oauthjwt.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +22,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomSuccessHandler customSuccessHandler;
+    private final LoginSuccessHandler loginSuccessHandler;
     private final JWTUtil jwtUtil;
+    private final MemberService memberService;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
@@ -42,20 +44,23 @@ public class SecurityConfig {
 
         //경로별 인가 작업
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/start", "/resources/**","/auth/refresh").permitAll()
+                .requestMatchers("/","/member/signup", "/resources/**","/auth/refresh"
+                ,"/api/member/check-userId","/api/member/check-nickname","/api/member/signup"
+                ).permitAll()
+                //.requestMatchers("/main").authenticated()
                 .anyRequest().authenticated());
 
         //Form 로그인 방식
-        http.formLogin((auth) -> auth.loginPage("/start").loginProcessingUrl("/process-login"));
+        http.formLogin((auth) -> auth.loginPage("/").loginProcessingUrl("/process-login").successHandler(loginSuccessHandler).failureUrl("/"));
 
         //JWTFilter 추가
-        http.addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JWTFilter(jwtUtil,memberService), UsernamePasswordAuthenticationFilter.class);
 
         //oauth2
         http.oauth2Login((oauth2) -> oauth2
                 .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
-                        .userService(customOAuth2UserService))
-                .successHandler(customSuccessHandler));
+                    .userService(customOAuth2UserService))
+                    .successHandler(loginSuccessHandler));
 
 
 

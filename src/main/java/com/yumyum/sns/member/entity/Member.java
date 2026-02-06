@@ -8,17 +8,18 @@ import com.yumyum.sns.member.dto.MemberEditDto;
 import com.yumyum.sns.post.entity.Likes;
 import com.yumyum.sns.post.entity.Post;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Member {
 
     @Id
@@ -63,7 +64,7 @@ public class Member {
     private String profileImage;
     @Column(length = 10)
     private String gender;
-    @Column(length = 20)
+    @Column(length = 255)
     private String password;
     @Column(length = 15)
     private String role;
@@ -104,5 +105,15 @@ public class Member {
         this.nickname = memberEditDto.getNickname();
         this.birthdate = memberEditDto.getBirthdate();
         this.profileImage = memberEditDto.getMemberProfilePath();
+    }
+
+    //회원가입 세팅
+    public void settingSignUp(){
+        this.role = "ROLE.USER";
+        this.identifier = "local "+ UUID.randomUUID().toString();
+    }
+
+    public void setPassword(String encodedPassword) {
+        this.password = encodedPassword;
     }
 }

@@ -15,9 +15,9 @@ public class PostSliceDto {
         private List<PostResponseDTO> content;
         private boolean hasNext = false;
 
-    public PostSliceDto(List<PostResponseDTO> content, Pageable pageable) {
+    public PostSliceDto(List<PostResponseDTO> content, int pageSize) {
         //다음페이지 존재유무 체크
-        if (content.size() > pageable.getPageSize()) {
+        if (content.size() > pageSize) {
             content.remove(content.size() - 1);
             hasNext = true;
         }

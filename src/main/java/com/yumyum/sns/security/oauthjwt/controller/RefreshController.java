@@ -1,7 +1,6 @@
-package com.yumyum.sns.oauthjwt.controller;
+package com.yumyum.sns.security.oauthjwt.controller;
 
-import com.yumyum.sns.member.service.MemberService;
-import com.yumyum.sns.oauthjwt.jwt.JWTUtil;
+import com.yumyum.sns.security.oauthjwt.jwt.JWTUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

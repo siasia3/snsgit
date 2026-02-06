@@ -89,9 +89,9 @@ public class PostServiceImpl implements PostService{
     //게시글 목록 조회
     @Override
     @Transactional(readOnly = true)
-    public List<PostResponseDTO> getPagingPosts(Pageable pageable, Long memberId) {
+    public List<PostResponseDTO> getPagingPosts(PostCursorRequest postCursorRequest, Long memberId) {
 
-        return postRepository.findPagingPosts(pageable,memberId);
+        return postRepository.findPagingPosts(postCursorRequest,memberId);
     }
 
     //게시글 상세 조회

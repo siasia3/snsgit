@@ -1,6 +1,7 @@
 package com.yumyum.sns.error.handler;
 
 import com.yumyum.sns.error.exception.BaseNotFoundException;
+import com.yumyum.sns.error.exception.DuplicateException;
 import com.yumyum.sns.error.exception.FileUploadException;
 import com.yumyum.sns.error.exception.S3UploadException;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,12 @@ public class ApiControllerAdvice {
     public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateException.class)
+    public ResponseEntity<String> handleDuplicate(DuplicateException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(e.getMessage());
     }
 
 }

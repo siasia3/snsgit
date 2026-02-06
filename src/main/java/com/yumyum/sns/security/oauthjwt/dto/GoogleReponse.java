@@ -1,23 +1,24 @@
-package com.yumyum.sns.oauthjwt.dto;
+package com.yumyum.sns.security.oauthjwt.dto;
 
 import java.util.Map;
 
-public class NaverResponse implements OAuth2Response{
+public class GoogleReponse implements OAuth2Response{
 
     private final Map<String, Object> attribute;
 
-    public NaverResponse(Map<String, Object> attribute){
-        this.attribute = (Map<String, Object>) attribute.get("response");
+
+    public GoogleReponse(Map<String, Object> attribute) {
+        this.attribute = attribute;
     }
 
     @Override
     public String getProvider() {
-        return "naver";
+        return "google";
     }
 
     @Override
     public String getProviderId() {
-        return attribute.get("id").toString();
+        return attribute.get("sub").toString();
     }
 
     @Override

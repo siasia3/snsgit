@@ -1,3 +1,5 @@
+
+
 //게시글 등록 파일 미리보기
 document.getElementById('fileInput').addEventListener('change', (event) => {
     let modal = document.getElementById('writeModal');
@@ -10,6 +12,8 @@ document.getElementById('modifyFileInput').addEventListener('change', (event) =>
     const files = event.target.files;
     renderFilePreview(modal,files);
 });
+
+
 
 //파일 미리보기 렌더링
 function renderFilePreview(modal,files){
@@ -173,25 +177,44 @@ async function deletePost(postId){
 
 
 
-let page = 0;
+
+let cursorCreatedAt = null;
+let cursorPostId = null;
 let isPostFetching = false; // 중복 요청 방지
 let hasMorePosts = true;
+//let page = 0;
 const postSize = 10;
 //게시글 페이징 api
 async function pagingPosts(){
     if (!hasMorePosts || isPostFetching) return;
     isPostFetching = true;
 
+    const params = new URLSearchParams({
+        size: postSize
+    });
+
+    if (cursorCreatedAt && cursorPostId) {
+        params.append("cursorCreatedAt", cursorCreatedAt);
+        params.append("cursorPostId", cursorPostId);
+    }
+
     const options = {
         method: 'GET'
     };
-    const response = await fetchWithAuth(`/api/posts?page=${page}&size=${postSize}`,options);
+    const response = await fetchWithAuth(`/api/posts?${params.toString()}`,options);
     const data = await response.json();
     if(data.content.length > 0){
         renderPosts(data);
     }
-    page += 1;
+
     hasMorePosts = data.hasNext;
+
+    if(hasMorePosts){
+        const lastPost = data.content[data.content.length - 1];
+        cursorCreatedAt = lastPost.createdAt;
+        cursorPostId = lastPost.postId;
+    }
+
     isPostFetching = false;
 }
 
@@ -480,6 +503,7 @@ function createPostInfo(template,post){
 
     if(post.content){
         postText.innerText = post.content;
+
         if (post.content.length >= 14 || hasLineBreak){
             moreBtn.style.display = 'block';
         }
@@ -518,5 +542,19 @@ function resetModifyModal(){
     modal.querySelector('.nextButton').style.display = 'none';
 }
 
+//게시글 파일 확장자를 통한 렌더링
+function renderMediaElementByExtension(fileUrl,template){
+    const extension = fileUrl.split('.').pop().toLowerCase();
 
+    if (["mp4", "webm","mov","avi"].includes(extension)) {
+        template.querySelector('img.postMedia').remove();
+        template.querySelector('video.postMedia').src = fileUrl;
+    } else if (["jpg", "png", "jpeg", "gif", "jfif", "webp"].includes(extension)) {
+        template.querySelector('video.postMedia').remove();
+        template.querySelector('img.postMedia').src = fileUrl;
+    } else {
+        console.warn("지원되지 않는 확장자입니다:", extension);
+        template.querySelector('video.postMedia').remove();
+    }
+}
 

@@ -1,4 +1,4 @@
-package com.yumyum.sns.oauthjwt.service;
+package com.yumyum.sns.security.oauthjwt.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

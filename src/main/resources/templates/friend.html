@@ -4,15 +4,15 @@
       layout:decorate="~{layout}">
 <body>
 <div layout:decorate="layout.html">
-    <main layout:fragment="content" id="friendMain">
+    <main layout:fragment="content" id="friendRequestMain">
         <div class="friendRequestMain">
             <div class="friendRequestTitle">
                 <span class="customLargeBoldFont">친구 요청</span>
             </div>
 
             <div class="tab-buttons">
-                <button onclick="showTab('received')">받은 친구 요청</button>
-                <button onclick="showTab('sent')">보낸 친구 요청</button>
+                <button id="tabReceived" class="active" onclick="showTab('received','tabReceived')">받은 친구 요청</button>
+                <button id="tabSent" onclick="showTab('sent','tabSent')">보낸 친구 요청</button>
             </div>
 
             <div id="received" class="tab-content">
@@ -76,7 +76,7 @@
             if (event.target.classList.contains('acceptBtn')) {
                 let friendRequest = event.target.closest('.friendReq');
                 let FRID = friendRequest.getAttribute('data-friendRequest-id');
-                let result = await friendRequestRefuse(FRID);
+                let result = await friendRequestAccept(FRID);
                 if(result){
                     friendRequest.remove();
                 }
@@ -119,9 +119,24 @@
             }
         });
 
-        function showTab(tabId) {
+        function showTab(tabId,element) {
+            let receivedTab = document.getElementById('tabReceived');
+            let sentTab = document.getElementById('tabSent');
         // 모든 탭 숨김
-            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            if(element == 'tabReceived'){
+                receivedTab.classList.add('active');
+                sentTab.classList.remove('active');
+
+            }else if(element == 'tabSent'){
+                sentTab.classList.add('active');
+                receivedTab.classList.remove('active');
+            }
+
+
         // 선택된 탭만 표시
             document.getElementById(tabId).style.display = 'block';
         }

@@ -84,6 +84,7 @@
         </main>
     </div>
 <th:block layout:fragment="script">
+    <script src="/js/modal.js"></script>
     <script src="/js/userDetail.js" defer></script>
     <script src="/js/comment.js" defer></script>
     <script src="/js/like.js" defer></script>
@@ -109,9 +110,9 @@
             pagingUserPosts(nickname).then(userPost => renderUserPosts(userPost));
         });*/
 
-        const url = window.location.pathname;
-        const nicknameMatch = url.match(/\/user\/([^\/]+)/);
-        const nickname = nicknameMatch[1];
+        let url = window.location.pathname;
+        let nicknameMatch = url.match(/\/user\/([^\/]+)/);
+        let nickname = nicknameMatch[1];
 
         window.addEventListener("load", async () => {
             let userData = await loadUserInfo(nickname);
@@ -125,8 +126,10 @@
 
         window.addEventListener("scroll", async () => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-                let likesPost = await pagingUserPosts(nickname);
-                renderUserPosts(userPost);
+                let userPost = await pagingUserPosts(nickname);
+                if (userPost.content.length > 0) {
+                    renderUserPosts(userPost);
+                }
             }
         });
 
@@ -226,9 +229,7 @@
         //프로필 편집 버튼 클릭이벤트
         document.getElementById('profileEdit').addEventListener('click',function(){
             window.location.href = `${BASE_URL}/member/profile/edit`;
-
         })
-
 
     </script>
 </th:block>

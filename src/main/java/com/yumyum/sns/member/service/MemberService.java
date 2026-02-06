@@ -1,9 +1,6 @@
 package com.yumyum.sns.member.service;
 
-import com.yumyum.sns.member.dto.MemberEditDto;
-import com.yumyum.sns.member.dto.MemberEditResponse;
-import com.yumyum.sns.member.dto.MemberSearchDto;
-import com.yumyum.sns.member.dto.NicknamePreviewDto;
+import com.yumyum.sns.member.dto.*;
 import com.yumyum.sns.member.entity.Member;
 
 import java.util.List;
@@ -26,8 +23,8 @@ public interface MemberService {
     public Member getMemberByIdentifier(String identifier);
 
     /**
-     * ID로 회원 조회, 없는 경우 Exception
-     * @param memberId 회원ID
+     * PK로 회원 조회, 없는 경우 Exception
+     * @param memberId 회원 PK
      * @return 조회된 회원 엔티티
      */
     Member getMemberById(Long memberId);
@@ -46,6 +43,13 @@ public interface MemberService {
      */
     public boolean checkNicknameDuplicate(String nickname);
 
+    /**
+     * 회원ID 중복체크
+     * @param userId 회원 ID
+     * @return 중복인 경우 true, 중복이 아닌 경우 false
+     */
+    public boolean checkUserIdDuplicate(String userId);
+
     //식별자로 회원 확인
 
     /**
@@ -60,7 +64,14 @@ public interface MemberService {
      * @param member 등록할 회원 엔티티
      * @return 등록된 회원 엔티티
      */
-    public Member createMember(Member member);
+    public Member createSocialMember(Member member);
+
+    /**
+     * 일반 회원가입
+     * @param signupDTO 등록할 회원 DTO
+     * @return 등록된 회원 엔티티
+     */
+    public Member createLocalMember(SignupDTO signupDTO);
 
     //회원 수정
 
@@ -89,7 +100,7 @@ public interface MemberService {
 
     /**
      * 회원 프로필편집 정보 조회
-     * @param memberId 회원 Id
+     * @param memberId 회원 PK
      * @return 편집 회원정보 dto
      */
     public MemberEditDto getMemberEditInfo(Long memberId);

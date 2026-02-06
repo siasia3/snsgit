@@ -1,11 +1,15 @@
 package com.yumyum.sns.member.service;
 
+import com.yumyum.sns.error.exception.DuplicateException;
+import com.yumyum.sns.error.exception.DuplicateNicknameException;
+import com.yumyum.sns.error.exception.DuplicateUserIdException;
 import com.yumyum.sns.error.exception.MemberNotFoundException;
 import com.yumyum.sns.infra.s3.S3StorageService;
 import com.yumyum.sns.member.dto.*;
 import com.yumyum.sns.member.entity.Member;
 import com.yumyum.sns.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,8 +25,9 @@ public class MemberServiceImpl implements MemberService{
 
     private final MemberRepository memberRepository;
     private final S3StorageService s3StorageService;
+    private final PasswordEncoder passwordEncoder;
 
-    //id값으로 회원 확인
+    //회원 pk로 회원 확인
     @Override
     public Boolean checkMember(Long memberId) {
         return memberRepository.findById(memberId).isPresent();
@@ -34,7 +39,7 @@ public class MemberServiceImpl implements MemberService{
         return memberRepository.findByIdentifier(identifier).orElseThrow(() -> new MemberNotFoundException(identifier + " 식별자를 가진 회원이 존재하지 않습니다"));
     }
 
-    //id값으로 회원 조회
+    //회원 pk로 회원 조회
     @Override
     public Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId + " id를 가진 회원이 존재하지 않습니다"));
@@ -47,8 +52,14 @@ public class MemberServiceImpl implements MemberService{
     }
 
     //닉네임 중복 확인
+    @Override
     public boolean checkNicknameDuplicate(String nickname) {
         return memberRepository.existsByNickname(nickname);
+    }
+
+    @Override
+    public boolean checkUserIdDuplicate(String userId) {
+        return memberRepository.existsByUserId(userId);
     }
 
     //식별자 회원 확인
@@ -59,8 +70,26 @@ public class MemberServiceImpl implements MemberService{
 
     //소셜로그인 회원 생성
     @Override
-    public Member createMember(Member member){
+    public Member createSocialMember(Member member){
          return memberRepository.save(member);
+    }
+
+    //회원가입 회원 생성
+    @Override
+    public Member createLocalMember(SignupDTO signupDTO) {
+
+        if(checkNicknameDuplicate(signupDTO.getNickname())){
+            throw new DuplicateNicknameException();
+        }
+
+        if(checkUserIdDuplicate(signupDTO.getUserId())){
+            throw new DuplicateUserIdException();
+        }
+
+        Member member = signupDTO.toEntity();
+        member.settingSignUp();
+        member.setPassword(passwordEncoder.encode(signupDTO.getPassword()));
+        return memberRepository.save(member);
     }
 
     //소셜로그인 회원정보 수정

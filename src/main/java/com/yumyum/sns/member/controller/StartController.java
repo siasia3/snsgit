@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Controller
 public class StartController {
 
-    @GetMapping("/start")
+    @GetMapping("/")
     public String mainAPI(){
 
-        return "start";
+        return "index";
     }
 
     @GetMapping("/main")

@@ -1,6 +1,6 @@
 package com.yumyum.sns.config.webSocket;
 
-import com.yumyum.sns.oauthjwt.jwt.JWTUtil;
+import com.yumyum.sns.security.oauthjwt.jwt.JWTUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

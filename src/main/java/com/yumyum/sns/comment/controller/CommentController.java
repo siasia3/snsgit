@@ -2,17 +2,14 @@ package com.yumyum.sns.comment.controller;
 
 import com.yumyum.sns.comment.dto.*;
 import com.yumyum.sns.comment.service.CommentService;
-import com.yumyum.sns.oauthjwt.dto.CustomOAuth2User;
-import com.yumyum.sns.oauthjwt.jwt.JWTUtil;
+import com.yumyum.sns.security.oauthjwt.jwt.JWTUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 

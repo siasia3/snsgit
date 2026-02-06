@@ -14,7 +14,7 @@ let hasMoreUserPosts = true;
 const userPostSize = 12;
 
 async function pagingUserPosts(nickname){
-    if (!hasMoreUserPosts || isUserPostFetching) return;
+    if (!hasMoreUserPosts || isUserPostFetching) return {content:[]};
     isUserPostFetching = true;
     const options = {
         method: 'GET'
@@ -64,19 +64,5 @@ function renderUserPosts(userPosts){
         postArea.appendChild(postThumbnail);
     });
 }
-//게시글 파일 확장자를 통한 렌더링
-function renderMediaElementByExtension(fileUrl,template){
-    const extension = fileUrl.split('.').pop().toLowerCase();
 
-    if (["mp4", "webm","mov","avi"].includes(extension)) {
-        template.querySelector('img.postMedia').remove();
-        template.querySelector('video.postMedia').src = fileUrl;
-    } else if (["jpg", "png", "jpeg", "gif", "jfif", "webp"].includes(extension)) {
-        template.querySelector('video.postMedia').remove();
-        template.querySelector('img.postMedia').src = fileUrl;
-    } else {
-        console.warn("지원되지 않는 확장자입니다:", extension);
-        template.querySelector('video.postMedia').remove();
-    }
-}
 

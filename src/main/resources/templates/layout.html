@@ -80,7 +80,6 @@
         let preview = event.target.closest('.preview');
         if (preview) {
             let nickname = preview.querySelector('.previewNickName').textContent;
-            console.log(nickname);
             window.location.href = `${BASE_URL}/user/${nickname}`;
         }
     });
@@ -94,6 +93,11 @@
     document.getElementById('likePage').addEventListener('click',function (){
         window.location.href = `${BASE_URL}/member/likes`;
     });
+    document.getElementById('myPage').addEventListener('click',function (){
+        let myNickname = sessionStorage.getItem('nickname');
+        window.location.href = `${BASE_URL}/user/${myNickname}`;
+    })
+
 
     //로그아웃 클릭
     document.getElementById('logout').addEventListener('click',function (){

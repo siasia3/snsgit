@@ -1,11 +1,10 @@
-package com.yumyum.sns.oauthjwt.oauth2;
+package com.yumyum.sns.security.handler;
 
 
-import com.yumyum.sns.oauthjwt.dto.CustomOAuth2User;
-import com.yumyum.sns.oauthjwt.jwt.JWTUtil;
-import com.yumyum.sns.oauthjwt.service.TokenService;
+import com.yumyum.sns.security.common.AuthMember;
+import com.yumyum.sns.security.oauthjwt.jwt.JWTUtil;
+import com.yumyum.sns.security.oauthjwt.service.TokenService;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,7 @@ import java.util.Iterator;
 
 @RequiredArgsConstructor
 @Component
-public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JWTUtil jwtUtil;
     private final TokenService tokenService;
@@ -28,17 +27,17 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-        //OAuth2User
-        CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
+        //OAuth2User or UserDetails
+        AuthMember customUserDetails = (AuthMember) authentication.getPrincipal();
 
-        String username = customUserDetails.getUsername();
+        String username = customUserDetails.getIdentifier();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String accessToken = jwtUtil.createJwt(username, role, 30*1000L);
+        String accessToken = jwtUtil.createJwt(username, role, 30*60*1000L);
         String refreshToken = jwtUtil.createRefreshToken(username,3*60*60*1000L);
         tokenService.saveRefreshToken(username,refreshToken,3*60*60*1000L);
 

@@ -1,7 +1,8 @@
-package com.yumyum.sns.oauthjwt.jwt;
+package com.yumyum.sns.security.oauthjwt.jwt;
 
-import com.yumyum.sns.oauthjwt.dto.CustomOAuth2User;
-import com.yumyum.sns.oauthjwt.dto.UserDTO;
+import com.yumyum.sns.member.entity.Member;
+import com.yumyum.sns.member.service.MemberService;
+import com.yumyum.sns.security.login.dto.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -11,20 +12,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Date;
 
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
+    private final MemberService memberService;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.startsWith("/start") || path.startsWith("/public") || path.startsWith("/auth/refresh");
+        return path.equals("/") || path.startsWith("/public") || path.startsWith("/auth/refresh") || path.startsWith("/member/signup")
+                || path.startsWith("/api/member/signup")
+                || path.startsWith("/api/member/check-userId") || path.startsWith("/api/member/check-nickname");
     }
 
     @Override
@@ -42,25 +46,28 @@ public class JWTFilter extends OncePerRequestFilter {
         String authorization = null;
         String refresh = null;
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
 
-            System.out.println(cookie.getName());
-            if (cookie.getName().equals("Authorization")) {
+                System.out.println(cookie.getName());
+                if (cookie.getName().equals("Authorization")) {
 
-                authorization = cookie.getValue();
-            }
-            if(cookie.getName().equals("refreshToken")){
-                refresh = cookie.getValue();
+                    authorization = cookie.getValue();
+                }
+                if (cookie.getName().equals("refreshToken")) {
+                    refresh = cookie.getValue();
+                }
             }
         }
 
         //Authorization 헤더 검증
         if (authorization == null) {
 
-            System.out.println("token null");
+            /*System.out.println("token null");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Access token expired");
+            response.getWriter().write("Access token expired");*/
             //조건이 해당되면 메소드 종료 (필수)
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -81,7 +88,7 @@ public class JWTFilter extends OncePerRequestFilter {
             }
             //ssr 기반 화면요청이면서 리프레쉬 만료인 경우
             if(jwtUtil.isExpired(refreshToken)){
-                response.sendRedirect("/start");
+                response.sendRedirect("/");
             }
 
             //ssr 기반 화면요청이면서 리프레쉬 유효한 경우
@@ -97,16 +104,18 @@ public class JWTFilter extends OncePerRequestFilter {
             String identifier = jwtUtil.getUsername(accessToken);
             String role = jwtUtil.getRole(accessToken);
 
-            //userDTO를 생성하여 값 set
-            UserDTO userDTO = new UserDTO(identifier, role);
+            //member 조회
+            Member member = memberService.getMemberByIdentifier(identifier);
 
             //UserDetails에 회원 정보 객체 담기
-            CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
+            CustomUserDetails customUser = new CustomUserDetails(member);
 
             //스프링 시큐리티 인증 토큰 생성
-            Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+            Authentication authToken = new UsernamePasswordAuthenticationToken(customUser, null, customUser.getAuthorities());
             //세션에 사용자 등록
             SecurityContextHolder.getContext().setAuthentication(authToken);
+            CustomUserDetails user = (CustomUserDetails) authToken.getPrincipal();
+
         }
 
         filterChain.doFilter(request, response);

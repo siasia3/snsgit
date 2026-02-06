@@ -13,12 +13,14 @@
                             <div class="profile-div">
                                 <img src="/image/basicProfile.jpg" class="profile-img">
                             </div>
-                            <span class="authorInfo customBoldFont">김래홍 1일</span>
-                            <div class="moreBtn"
-                                 data-bs-toggle="dropdown"
-                                 aria-expanded="false"
-                                 style="width:80%; cursor: pointer; display: none;">
-                                <i class="fa-solid fa-ellipsis"></i>
+                            <div class="user-row">
+                                <span class="authorInfo customBoldFont">김래홍 1일</span>
+                                <div class="moreBtn"
+                                     data-bs-toggle="dropdown"
+                                     aria-expanded="false"
+                                     style="width:80%; cursor: pointer; display: none;">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </div>
                             </div>
 
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
@@ -88,12 +90,14 @@
                             <div class="profile-div">
                                 <img src="image/basicProfile.jpg" class="profile-img">
                             </div>
-                            <span class="authorInfo customBoldFont">김래홍 1일</span>
-                            <div class="moreBtn"
-                                 data-bs-toggle="dropdown"
-                                 aria-expanded="false"
-                                 style="width:80%; cursor: pointer;">
-                                <i class="fa-solid fa-ellipsis"></i>
+                            <div class="user-row">
+                                <span class="authorInfo customBoldFont">김래홍 1일</span>
+                                <div class="moreBtn"
+                                     data-bs-toggle="dropdown"
+                                     aria-expanded="false"
+                                     style="width:80%; cursor: pointer; display: none;">
+                                    <i class="fa-solid fa-ellipsis"></i>
+                                </div>
                             </div>
 
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
@@ -139,6 +143,7 @@
                     </div>
                 </template>
             </div>
+            <div id="post-sentinel"></div>
         </div>
 
         <div th:replace="~{modal/postDetailModal :: postDetailModal}"></div>
@@ -148,22 +153,43 @@
 </div>
 <th:block layout:fragment="script">
 
-
+    <script src="/js/modal.js"></script>
     <script src="/js/comment.js" defer></script>
     <script src="/js/like.js" defer></script>
     <script src="/js/reply.js" defer></script>
 
     <script>
-        window.addEventListener("load", async function (){
+        window.addEventListener("load", function (){
             pagingPosts();
         });
 
+        /*const OFFSET = 400;
         // 스크롤 시 post 페이징 API 호출
         window.addEventListener("scroll", () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+            const bottom = window.innerHeight + window.scrollY;
+            const height = document.documentElement.scrollHeight;
+            if (bottom >= height - OFFSET) {
                 pagingPosts();
             }
-        });
+        });*/
+
+        // 스크롤 시 post 페이징 API 호출 (IntersectionObserver 방식)
+        const sentinel = document.getElementById("post-sentinel");
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    pagingPosts();
+                }
+            },
+            {
+                root: null,
+                rootMargin: "300px",
+                threshold: 0
+            }
+        );
+
+        observer.observe(sentinel);
 
         //게시글 목록 좋아요 클릭이벤트
         document.getElementById('mainDiv-inner').addEventListener('click', async (event) => {
@@ -258,7 +284,7 @@
                     commentContent: commentContent
                 }
 
-                let responseData = createComment(data);
+                let responseData = await createComment(data);
                 const cloneComment = document.getElementById('comment-template').content.cloneNode(true);
                 cloneComment.querySelector('.comment-nickName').textContent = responseData.commentAuthor;
                 cloneComment.querySelector('.comment-content-preview').textContent = responseData.commentContent;
@@ -293,10 +319,11 @@
                         renderPostDetail(response1);
                         renderCommentElements(response2);
                     });*/
-                document.getElementById('postDetailModal').classList.add('show');
+                detailModalOverlay.classList.remove('hidden');
 
             }
         });
+
     </script>
 </th:block>
 

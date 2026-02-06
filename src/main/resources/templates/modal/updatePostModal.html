@@ -1,46 +1,46 @@
 
 <div th:fragment="updatePostModal">
-    <div class="modal" id="modifyModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">게시물 만들기</h5>
-                </div>
-                <form id="updateForm" enctype="multipart/form-data">
-                    <div class="modal-body modalForm">
-                        <div id="modifyPostId" style="display: none" data-post-id=""></div>
-                        <div id="attachmentId" style="display: none" data-attach-id=""></div>
-                        <div>
-                            <label for="modifyPostContent">게시글 내용</label>
-                            <textarea id="modifyPostContent" class="form-control" rows="4" placeholder="내용을 입력하세요..."></textarea>
-                        </div>
-
-                        <!-- 이미지 또는 동영상 파일 업로드 -->
-                        <div>
-                            <label class="contentLabel" for="modifyFileInput">이미지/동영상 업로드</label>
-                            <input type="file" id="modifyFileInput" accept="image/*, video/*" class="form-control" multiple/>
-                        </div>
-
-                        <!-- 파일 미리보기 캐러셀 -->
-                        <div id="updateDynamicCarousel" class="carousel slide" data-bs-ride="carousel">
-                            <label class="contentLabel">이미지/동영상 미리보기</label>
-                            <div class="carousel-inner carouselItems"></div>
-                            <button class="carousel-control-prev prevButton" type="button" data-bs-target="#updateDynamicCarousel" data-bs-slide="prev" style="display: none;">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next nextButton" type="button" data-bs-target="#updateDynamicCarousel" data-bs-slide="next" style="display: none;">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>
+        <div class="modal" id="modifyModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">게시물 만들기</h5>
                     </div>
-                </form>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeUpdateModal()">닫기</button>
-                    <button type="button" id="updateBtn" class="btn btn-primary">수정</button>
+                    <form id="updateForm" enctype="multipart/form-data">
+                        <div class="modal-body modalForm">
+                            <div id="modifyPostId" style="display: none" data-post-id=""></div>
+                            <div id="attachmentId" style="display: none" data-attach-id=""></div>
+                            <div>
+                                <label for="modifyPostContent">게시글 내용</label>
+                                <textarea id="modifyPostContent" class="form-control" rows="4" placeholder="내용을 입력하세요..."></textarea>
+                            </div>
+
+                            <!-- 이미지 또는 동영상 파일 업로드 -->
+                            <div>
+                                <label class="contentLabel" for="modifyFileInput">이미지/동영상 업로드</label>
+                                <input type="file" id="modifyFileInput" accept="image/*, video/*" class="form-control" multiple/>
+                            </div>
+
+                            <!-- 파일 미리보기 캐러셀 -->
+                            <div id="updateDynamicCarousel" class="carousel slide" data-bs-ride="carousel">
+                                <label class="contentLabel">이미지/동영상 미리보기</label>
+                                <div class="carousel-inner carouselItems"></div>
+                                <button class="carousel-control-prev prevButton" type="button" data-bs-target="#updateDynamicCarousel" data-bs-slide="prev" style="display: none;">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next nextButton" type="button" data-bs-target="#updateDynamicCarousel" data-bs-slide="next" style="display: none;">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeUpdateModal()">닫기</button>
+                        <button type="button" id="updateBtn" class="btn btn-primary">수정</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 </div>

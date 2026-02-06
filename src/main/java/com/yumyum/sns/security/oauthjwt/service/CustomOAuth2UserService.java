@@ -1,10 +1,9 @@
-package com.yumyum.sns.oauthjwt.service;
+package com.yumyum.sns.security.oauthjwt.service;
 
 
 import com.yumyum.sns.member.entity.Member;
-import com.yumyum.sns.member.repository.MemberRepository;
 import com.yumyum.sns.member.service.MemberService;
-import com.yumyum.sns.oauthjwt.dto.*;
+import com.yumyum.sns.security.oauthjwt.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -49,7 +48,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 nickname = generateTemporaryNickname(oAuth2Response.getProvider());
             }
             Member Member = new Member(identifier,oAuth2Response.getName(),nickname, oAuth2Response.getEmail(), "ROLE_USER");
-            memberService.createMember(Member);
+            memberService.createSocialMember(Member);
             UserDTO userDTO = new UserDTO("ROLE_USER",oAuth2Response.getName(),identifier);
 
             return new CustomOAuth2User(userDTO);

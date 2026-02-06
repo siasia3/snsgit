@@ -1,8 +1,8 @@
-package com.yumyum.sns.oauthjwt.controller;
+package com.yumyum.sns.security.oauthjwt.controller;
 
-import com.yumyum.sns.oauthjwt.dto.CustomOAuth2User;
-import com.yumyum.sns.oauthjwt.jwt.JWTUtil;
-import com.yumyum.sns.oauthjwt.service.TokenService;
+import com.yumyum.sns.security.common.AuthMember;
+import com.yumyum.sns.security.oauthjwt.dto.CustomOAuth2User;
+import com.yumyum.sns.security.oauthjwt.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -22,11 +22,11 @@ public class LogoutController {
 
     @PostMapping("/logout")
     public ResponseEntity logout(
-            @AuthenticationPrincipal CustomOAuth2User oAuth2User,
+            @AuthenticationPrincipal AuthMember userDetails,
             @CookieValue(value = "refreshToken", required = false) String refreshToken){
 
         if (refreshToken != null) {
-            tokenService.deleteRefreshToken(oAuth2User.getUsername());
+            tokenService.deleteRefreshToken(userDetails.getIdentifier());
         }
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", "")

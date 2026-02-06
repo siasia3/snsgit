@@ -61,9 +61,9 @@
         <script src="/js/chat.js" defer></script>
 
         <script>
-            const path = window.location.pathname;
-            const nickname = path.split('/')[2];
-            const senderId = sessionStorage.getItem("userId");
+            let path = window.location.pathname;
+            let nickname = path.split('/')[2];
+            let senderId = sessionStorage.getItem("userId");
             let receiverId;
             let chatroomId = '[[${chatroomId}]]';
 

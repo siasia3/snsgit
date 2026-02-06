@@ -2,6 +2,7 @@ package com.yumyum.sns.post.repository;
 
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.yumyum.sns.post.dto.*;
@@ -28,13 +29,25 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
     //페이징된 게시글 조회
     @Override
-    public List<PostResponseDTO> findPagingPosts(Pageable pageable,Long memberId) {
+    public List<PostResponseDTO> findPagingPosts(PostCursorRequest cursor,Long memberId) {
+
+        BooleanExpression cursorCondition = null;
+        LocalDateTime cursorCreatedAt = cursor.getCursorCreatedAt();
+        Long cursorPostId = cursor.getCursorPostId();
+
+        if (cursorCreatedAt != null && cursorPostId != null) {
+            cursorCondition = post.createdAt.lt(cursorCreatedAt)
+                    .or(
+                            post.createdAt.eq(cursorCreatedAt)
+                                    .and(post.id.lt(cursorPostId))
+                    );
+        }
 
         List<PostResponseDTO> postList = queryFactory
                 .select(Projections.constructor(PostResponseDTO.class,
                         post.id,
                         member.id,
-                        member.name,
+                        member.nickname,
                         member.profileImage,
                         attachment.id,
                         post.content,
@@ -54,10 +67,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .join(post.attachment,attachment)
                 .leftJoin(post.likesList, likes)
                 .leftJoin(post.commentList, comment)
+                .where(cursorCondition)
                 .groupBy(post.id)
                 .orderBy(post.createdAt.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize()+1)
+                .limit(cursor.getSize()+1)
                 .fetch();
         return postList;
     }
@@ -69,7 +82,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .select(new QPostDetailDto(
                         member.id,
                         member.profileImage,
-                        member.name,
+                        member.nickname,
                         post.id,
                         post.content,
                         post.createdAt,

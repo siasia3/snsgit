@@ -3,8 +3,9 @@ package com.yumyum.sns.post.controller;
 import com.yumyum.sns.error.exception.ApiResponse;
 import com.yumyum.sns.member.entity.Member;
 import com.yumyum.sns.member.service.MemberService;
-import com.yumyum.sns.oauthjwt.dto.CustomOAuth2User;
-import com.yumyum.sns.oauthjwt.jwt.JWTUtil;
+import com.yumyum.sns.security.common.AuthMember;
+import com.yumyum.sns.security.oauthjwt.dto.CustomOAuth2User;
+import com.yumyum.sns.security.oauthjwt.jwt.JWTUtil;
 import com.yumyum.sns.post.dto.*;
 import com.yumyum.sns.post.service.PostFacadeService;
 import com.yumyum.sns.post.service.PostService;
@@ -28,6 +29,7 @@ public class PostController {
     private final PostService postService;
     private final MemberService memberService;
     private final JWTUtil jwtUtil;
+    private static final int MAX_SIZE = 15;
 
     //게시글 등록
     @PostMapping(value = "/post", consumes = "multipart/form-data")
@@ -77,11 +79,11 @@ public class PostController {
 
     //게시글 목록 조회
     @GetMapping(value = "/posts")
-    public ResponseEntity<PostSliceDto> getPosts(Pageable pageable,
+    public ResponseEntity<PostSliceDto> getPosts(PostCursorRequest cursor,
                                  @CookieValue(name = "Authorization") String jwt){
         String username = jwtUtil.getUsername(jwt);
         Member member = memberService.getMemberByIdentifier(username);
-        PostSliceDto postsWithInfo = postFacadeService.getPostsWithInfo(pageable, member.getId());
+        PostSliceDto postsWithInfo = postFacadeService.getPostsWithInfo(cursor, member.getId());
         return ResponseEntity.ok(postsWithInfo);
     }
 
@@ -109,8 +111,8 @@ public class PostController {
                                                             @RequestParam(required = false) LocalDateTime cursor,
                                                             Authentication authentication){
 
-        CustomOAuth2User principal = (CustomOAuth2User) authentication.getPrincipal();
-        String identifier = principal.getUsername();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+        String identifier = principal.getIdentifier();
         Member member = memberService.getMemberByIdentifier(identifier);
 
         CursorPageResponse likedPosts = postService.getLikedPosts(pageSize, cursor, member.getId());

@@ -1,4 +1,4 @@
-package com.yumyum.sns.oauthjwt.jwt;
+package com.yumyum.sns.security.oauthjwt.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

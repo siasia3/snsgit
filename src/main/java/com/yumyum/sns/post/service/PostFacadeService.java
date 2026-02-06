@@ -1,9 +1,6 @@
 package com.yumyum.sns.post.service;
 
-import com.yumyum.sns.post.dto.PostRequestDto;
-import com.yumyum.sns.post.dto.PostSliceDto;
-import com.yumyum.sns.post.dto.PostUpdateRequestDTO;
-import com.yumyum.sns.post.dto.PostUpdateResponseDTO;
+import com.yumyum.sns.post.dto.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,10 +27,10 @@ public interface PostFacadeService {
 
     /**
      * 게시글 과 게시글 관련 정보 페이징 조회
-     * @param pageable 페이징
+     * @param cursor 페이징
      * @param memberId 회원 PK
      * @return 페이징 조회한 게시글
      */
-    PostSliceDto getPostsWithInfo(Pageable pageable, Long memberId);
+    PostSliceDto getPostsWithInfo(PostCursorRequest cursor, Long memberId);
 
 }

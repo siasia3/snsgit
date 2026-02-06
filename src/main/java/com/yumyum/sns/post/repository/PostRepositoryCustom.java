@@ -1,10 +1,7 @@
 package com.yumyum.sns.post.repository;
 
 import com.yumyum.sns.member.entity.Member;
-import com.yumyum.sns.post.dto.LikedPostDto;
-import com.yumyum.sns.post.dto.MemberPostDto;
-import com.yumyum.sns.post.dto.PostDetailDto;
-import com.yumyum.sns.post.dto.PostResponseDTO;
+import com.yumyum.sns.post.dto.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
@@ -15,11 +12,11 @@ public interface PostRepositoryCustom {
 
     /**
      * 게시글 페이징조회
-     * @param pageable 페이징
+     * @param cursor cursor 페이징
      * @param memberId 회원ID
      * @return 조회된 게시글들
      */
-    List<PostResponseDTO> findPagingPosts(Pageable pageable, Long memberId);
+    List<PostResponseDTO> findPagingPosts(PostCursorRequest cursor, Long memberId);
 
     /**
      * 게시글 상세조회

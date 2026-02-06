@@ -3,11 +3,14 @@ package com.yumyum.sns.member.controller;
 import com.yumyum.sns.member.dto.*;
 import com.yumyum.sns.member.entity.Member;
 import com.yumyum.sns.member.service.MemberService;
-import com.yumyum.sns.oauthjwt.dto.CustomOAuth2User;
+import com.yumyum.sns.security.common.AuthMember;
+import com.yumyum.sns.security.oauthjwt.dto.CustomOAuth2User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,9 +27,9 @@ public class MemberController {
 
     //로그인 후 현재 회원 정보 가져오는 컨트롤러
     @GetMapping("/member/info")
-    public ResponseEntity<?> getCurrentMemberId(@AuthenticationPrincipal CustomOAuth2User oAuth2User){
+    public ResponseEntity<?> getCurrentMemberId(@AuthenticationPrincipal AuthMember userDetail){
 
-        String identifier = oAuth2User != null ? oAuth2User.getUsername(): null;
+        String identifier = userDetail != null ? userDetail.getIdentifier(): null;
         Member checkMember = memberService.getMemberByIdentifier(identifier);
 
         if (identifier == null) {
@@ -85,17 +88,39 @@ public class MemberController {
         return ResponseEntity.ok(memberEditResponse);
     }
 
+    //닉네임 중복체크 컨트롤러
     @GetMapping("/member/check-nickname")
-    public ResponseEntity<?> checkNickname(@RequestParam String nickname){
+    public ResponseEntity<Void> checkNickname(@RequestParam String nickname){
         boolean isDuplicate = memberService.checkNicknameDuplicate(nickname);
 
         if (isDuplicate) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", "중복된 닉네임입니다."));
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
-        return ResponseEntity.ok(Map.of("message", "사용 가능한 닉네임입니다."));
+        return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/member/check-userId")
+    public ResponseEntity<Void> checkUserId(@RequestParam String userId){
+        boolean isDuplicate = memberService.checkUserIdDuplicate(userId);
+
+        if (isDuplicate) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    //회원가입
+    @PostMapping("/member/signup")
+    public ResponseEntity<Void> signup(@Valid @ModelAttribute SignupDTO signupDTO,
+                                    BindingResult bindingResult){
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        memberService.createLocalMember(signupDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
 }

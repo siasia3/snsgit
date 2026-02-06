@@ -1,6 +1,6 @@
 package com.yumyum.sns.post.controller;
 
-import com.yumyum.sns.oauthjwt.jwt.JWTUtil;
+import com.yumyum.sns.security.oauthjwt.jwt.JWTUtil;
 import com.yumyum.sns.post.dto.LikeDto;
 import com.yumyum.sns.post.service.LikesService;
 import com.yumyum.sns.validated.group.DeleteGroup;

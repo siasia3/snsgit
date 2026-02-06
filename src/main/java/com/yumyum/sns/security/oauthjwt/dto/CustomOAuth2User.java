@@ -1,12 +1,13 @@
-package com.yumyum.sns.oauthjwt.dto;
+package com.yumyum.sns.security.oauthjwt.dto;
 
+import com.yumyum.sns.security.common.AuthMember;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.*;
 
 
-public class CustomOAuth2User implements OAuth2User {
+public class CustomOAuth2User implements OAuth2User, AuthMember {
 
     private final UserDTO userDTO;
     private final Map<String, Object> attributes;
@@ -42,9 +43,12 @@ public class CustomOAuth2User implements OAuth2User {
         return userDTO.getUsername();
     }
 
-    public String getUsername(){
+    public String getUserName() {
         return userDTO.getUsername();
     }
 
-
+    @Override
+    public String getIdentifier() {
+        return userDTO.getUsername();
+    }
 }

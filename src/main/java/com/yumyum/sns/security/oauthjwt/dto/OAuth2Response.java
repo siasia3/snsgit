@@ -1,4 +1,4 @@
-package com.yumyum.sns.oauthjwt.dto;
+package com.yumyum.sns.security.oauthjwt.dto;
 
 public interface OAuth2Response {
 

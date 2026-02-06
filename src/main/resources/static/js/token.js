@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost';
+const BASE_URL = 'https://horizonsns.com';
 
 async function refreshAccessToken() {
     try {
@@ -9,14 +9,13 @@ async function refreshAccessToken() {
 
         if (response.ok) {
             console.log(response);
-            console.log("타긴 함??");
             let refresh = await response.json();
 
             return true;
         } else {
             //console.error('Refresh Token 만료 또는 유효하지 않음');
             alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-            window.location.href = `${BASE_URL}/start`; // 로그인 페이지로 리다이렉트
+            window.location.href = `${BASE_URL}`; // 로그인 페이지로 리다이렉트
             return false;
         }
     } catch (error) {
@@ -37,7 +36,7 @@ async function logout() {
             sessionStorage.removeItem("nickname");
             sessionStorage.removeItem("profileImage");
             sessionStorage.removeItem("userId");
-            window.location.href = `${BASE_URL}/start`;
+            window.location.href = `${BASE_URL}`;
 
         }else {
             alert('잠시 후 다시 시도해주세요.');

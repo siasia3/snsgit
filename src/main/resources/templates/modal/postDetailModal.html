@@ -1,162 +1,165 @@
 
 <!-- fragments/modal.html -->
 <div th:fragment="postDetailModal">
-    <div class="modal fade" id="postDetailModal" tabindex="-1">
-        <div class="postDetail-modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body postDetail-modal-content" data-post-id="777">
-                    <div class="post-media">
-                        <template id="postDetail-media-carousel">
-                            <div id="detailCarouselIndicators" class="carousel slide" data-bs-ride="carousel">
-                                <div class="carousel-indicators">
-                                    <button type="button" data-bs-target="#detailCarouselIndicators" data-bs-slide-to="0" class="active" aria-current="true"></button>
-                                    <button type="button" data-bs-target="#detailCarouselIndicators" data-bs-slide-to="1"></button>
+    <div id="detailModalOverlay" class="modal-overlay hidden" >
+        <div class="modal fade show" id="postDetailModal" tabindex="-1">
+            <button id="closeDetailModalBtn" class="close-btn">&times;</button>
+            <div class="postDetail-modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body postDetail-modal-content" data-post-id="777">
+                        <div class="post-media">
+                            <template id="postDetail-media-carousel">
+                                <div id="detailCarouselIndicators" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-indicators">
+                                        <button type="button" data-bs-target="#detailCarouselIndicators" data-bs-slide-to="0" class="active" aria-current="true"></button>
+                                        <button type="button" data-bs-target="#detailCarouselIndicators" data-bs-slide-to="1"></button>
+                                    </div>
+                                    <div class="carousel-inner">
+                                        <div class="carousel-item img-detail-container">
+                                            <img src="/image/bear.png" class="d-block w-100" alt="...">
+                                        </div>
+                                        <div class="carousel-item video-detail-container">
+                                            <video class="d-block w-100" controls>
+                                                <source src="/image/240330_small.mp4" type="video/mp4">
+                                            </video>
+                                        </div>
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#detailCarouselIndicators" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#detailCarouselIndicators" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
                                 </div>
-                                <div class="carousel-inner">
-                                    <div class="carousel-item img-detail-container active">
+                            </template>
+                            <template id="postDetail-media">
+                                <div class="media-inner">
+                                    <div class="img-detail-container">
                                         <img src="/image/bear.png" class="d-block w-100" alt="...">
                                     </div>
-                                    <div class="carousel-item video-detail-container">
+                                    <div class="video-detail-container">
                                         <video class="d-block w-100" controls>
                                             <source src="/image/240330_small.mp4" type="video/mp4">
                                         </video>
                                     </div>
                                 </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#detailCarouselIndicators" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#detailCarouselIndicators" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                </button>
-                            </div>
-                        </template>
-                        <template id="postDetail-media">
-                            <div class="media-inner">
-                                <div class="img-detail-container">
-                                    <img src="/image/bear.png" class="d-block w-100" alt="...">
-                                </div>
-                                <div class="video-detail-container">
-                                    <video class="d-block w-100" controls>
-                                        <source src="/image/240330_small.mp4" type="video/mp4">
-                                    </video>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                    <div class="post-detail">
-                        <div class="writerInfo customBoldFont">
-                            <div class="profile-div">
-                                <img src="/image/basicProfile.jpg" class="profile-img">
-                            </div>
-                            <div class="authorName"></div>
+                            </template>
                         </div>
-                        <div class="post-comment customFont">
-                            <div class="rowDiv small-pb-custom" id="modalPostContent">
+                        <div class="post-detail">
+                            <div class="writerInfo customBoldFont">
                                 <div class="profile-div">
                                     <img src="/image/basicProfile.jpg" class="profile-img">
                                 </div>
-                                <div class="post-comment-content">
-                                    <div class="rowDiv">
-                                        <div class="customFont" id="post-detail-content">
-                                            <span class="customBoldFont small-pr-custom authorName"></span>
+                                <div class="authorName"></div>
+                            </div>
+                            <div class="post-comment customFont">
+                                <div class="rowDiv small-pb-custom" id="modalPostContent">
+                                    <div class="profile-div">
+                                        <img src="/image/basicProfile.jpg" class="profile-img">
+                                    </div>
+                                    <div class="post-comment-content">
+                                        <div class="rowDiv">
+                                            <div class="customFont" id="post-detail-content">
+                                                <span class="customBoldFont small-pr-custom authorName"></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div id="comment-inner">
-                                <template id="postComment-template">
-                                    <div class="rowDiv small-pb-custom comment" data-comment-id="333">
-                                        <div class="profile-div">
-                                            <img src="/image/basicProfile.jpg" class="profile-img">
-                                        </div>
-                                        <div class="post-comment-content">
-                                            <div class="rowDiv">
-                                                <div class="customFont commentContent">
-                                                    <span class="customBoldFont small-pr-custom commentAuthor"></span>
-                                                </div>
+                                <div id="comment-inner">
+                                    <template id="postComment-template">
+                                        <div class="rowDiv small-pb-custom comment" data-comment-id="333">
+                                            <div class="profile-div">
+                                                <img src="/image/basicProfile.jpg" class="profile-img">
                                             </div>
-                                            <div class="rowDiv">
-                                                <div>
+                                            <div class="post-comment-content">
+                                                <div class="rowDiv">
+                                                    <div class="customFont commentContent">
+                                                        <span class="customBoldFont small-pr-custom commentAuthor"></span>
+                                                    </div>
                                                 </div>
-                                                <div class="greyFont replyInputBtn">
-                                                    답글 달기
-                                                </div>
-                                                <div class="commentDeleteBtn small-pl-custom"
-                                                     data-bs-toggle="dropdown"
-                                                     aria-expanded="false"
-                                                     style="cursor: pointer;">
-                                                    <i class="fas fa-ellipsis-h"></i>
-                                                </div>
+                                                <div class="rowDiv">
+                                                    <div>
+                                                    </div>
+                                                    <div class="greyFont replyInputBtn">
+                                                        답글 달기
+                                                    </div>
+                                                    <div class="commentDeleteBtn small-pl-custom"
+                                                         data-bs-toggle="dropdown"
+                                                         aria-expanded="false"
+                                                         style="cursor: pointer;">
+                                                        <i class="fas fa-ellipsis-h"></i>
+                                                    </div>
 
-                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                                    <li><a class="dropdown-item text-danger commentRemove" href="#">삭제</a></li>
-                                                </ul>
+                                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                        <li><a class="dropdown-item text-danger commentRemove" href="#">삭제</a></li>
+                                                    </ul>
 
-                                            </div>
-                                            <div class="reply-area">
-                                                <div class="replyInner">
-                                                    <template id="postReply-template">
-                                                        <div class="rowDiv small-pt-custom reply" data-reply-id="111">
-                                                            <div class="profile-div">
-                                                                <img src="/image/basicProfile.jpg" class="profile-img">
-                                                            </div>
-                                                            <div>
-                                                                <div class="rowDiv">
-                                                                    <div class="customFont replyContent">
-                                                                        <span class="customBoldFont small-pr-custom replyAuthor"></span>
+                                                </div>
+                                                <div class="reply-area">
+                                                    <div class="replyInner">
+                                                        <template id="postReply-template">
+                                                            <div class="rowDiv small-pt-custom reply" data-reply-id="111">
+                                                                <div class="profile-div">
+                                                                    <img src="/image/basicProfile.jpg" class="profile-img">
+                                                                </div>
+                                                                <div>
+                                                                    <div class="rowDiv">
+                                                                        <div class="customFont replyContent">
+                                                                            <span class="customBoldFont small-pr-custom replyAuthor"></span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="rowDiv">
+                                                                        <div>
+                                                                        </div>
+                                                                        <div class="greyFont replyInputBtn">
+                                                                            답글 달기
+                                                                        </div>
+                                                                        <div class="commentDeleteBtn small-pl-custom"
+                                                                             data-bs-toggle="dropdown"
+                                                                             aria-expanded="false"
+                                                                             style="cursor: pointer;">
+                                                                            <i class="fas fa-ellipsis-h"></i>
+                                                                        </div>
+                                                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                                            <li><a class="dropdown-item text-danger replyRemove" href="#">삭제</a></li>
+                                                                        </ul>
+
                                                                     </div>
                                                                 </div>
-                                                                <div class="rowDiv">
-                                                                    <div>
-                                                                    </div>
-                                                                    <div class="greyFont replyInputBtn">
-                                                                        답글 달기
-                                                                    </div>
-                                                                    <div class="commentDeleteBtn small-pl-custom"
-                                                                         data-bs-toggle="dropdown"
-                                                                         aria-expanded="false"
-                                                                         style="cursor: pointer;">
-                                                                        <i class="fas fa-ellipsis-h"></i>
-                                                                    </div>
-                                                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                                                        <li><a class="dropdown-item text-danger replyRemove" href="#">삭제</a></li>
-                                                                    </ul>
-
-                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                                <div class="rowDiv small-pt-custom alignCenter">
-                                                    <div class="dividerDiv"></div>
-                                                    <div class="greyFont small-pl-custom replySeeMore" data-reply-page="0">답글 <span class="replyCount"></span>개 모두 보기</div>
-                                                    <div class="greyFont small-pl-custom replyHide" style="display: none">답글 숨기기</div>
+                                                        </template>
+                                                    </div>
+                                                    <div class="rowDiv small-pt-custom alignCenter">
+                                                        <div class="dividerDiv"></div>
+                                                        <div class="greyFont small-pl-custom replySeeMore" data-reply-page="0">답글 <span class="replyCount"></span>개 모두 보기</div>
+                                                        <div class="greyFont small-pl-custom replyHide" style="display: none">답글 숨기기</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </template>
+                                    </template>
+                                </div>
+                                <div class="small-pb-custom commentPlusBtn" id="commentGet" style="display: none">
+                                    <button class="circle-btn">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="small-pb-custom commentPlusBtn" id="commentGet" style="display: none">
-                                <button class="circle-btn">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                            <div class="heartInfo">
+                                <div>
+                                    <span class="fa-regular fa-heart"></span>
+                                    <span class="fa-regular fa-comment"></span>
+                                </div>
+                                <div class="customBoldFont" style="padding-top: 0.5rem">
+                                    <div>좋아요 <span class="heartCount">0</span>개</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="heartInfo">
-                            <div>
-                                <span class="fa-regular fa-heart"></span>
-                                <span class="fa-regular fa-comment"></span>
+                            <div class="commentInput">
+                                <input class="comment-content" id="detailCommentInput" type="text" placeholder="댓글을 입력하세요..." />
+                                <div class="commentPostBtn" style="display: none;">게시</div>
                             </div>
-                            <div class="customBoldFont" style="padding-top: 0.5rem">
-                                <div>좋아요 <span class="heartCount">0</span>개</div>
-                            </div>
-                        </div>
-                        <div class="commentInput">
-                            <input class="comment-content" id="detailCommentInput" type="text" placeholder="댓글을 입력하세요..." />
-                            <div class="commentPostBtn" style="display: none;">게시</div>
                         </div>
                     </div>
                 </div>
