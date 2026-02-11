@@ -3,7 +3,7 @@
 async function getMemberInfo() {
     try {
         // 서버의 /memberId 엔드포인트로 GET 요청 보내기
-        const response = await fetch(`${BASE_URL}/api/member/info`, {
+        const response = await fetch(`/api/member/info`, {
             method: 'GET'
         });
 
@@ -21,12 +21,12 @@ async function getMemberInfo() {
             const errorData = await response.json();
             console.error('에러 발생:', errorData.message); // 실패 메시지 출력
             alert("로그인을 다시 해주시길 바랍니다.");
-            window.location.href = `${BASE_URL}/`;
+            window.location.href = `/`;
         }
     } catch (error) {
         console.error('서버 요청 중 에러:', error);
         alert("잠시 후 다시 로그인 해주세요");
-        window.location.href = `${BASE_URL}/`;
+        window.location.href = `/`;
     }
 }
 
@@ -51,7 +51,7 @@ async function getMemberProfileEditInfo(){
         return await response.json();
 
     } catch (error){
-        window.location.href = `${BASE_URL}/error/500`;
+        window.location.href = `/error/500`;
     }
 }
 

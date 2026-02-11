@@ -1,9 +1,6 @@
 package com.yumyum.sns.error.handler;
 
-import com.yumyum.sns.error.exception.BaseNotFoundException;
-import com.yumyum.sns.error.exception.DuplicateException;
-import com.yumyum.sns.error.exception.FileUploadException;
-import com.yumyum.sns.error.exception.S3UploadException;
+import com.yumyum.sns.error.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +14,11 @@ public class ApiControllerAdvice {
     @ExceptionHandler(BaseNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleNotFoundException(BaseNotFoundException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidLoginException.class)
+    public ResponseEntity<String> handleInvalidLogin(InvalidLoginException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
     @ExceptionHandler(FileUploadException.class)

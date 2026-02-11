@@ -29,6 +29,7 @@ public interface MemberService {
      */
     Member getMemberById(Long memberId);
 
+
     /**
      * 닉네임으로 회원 조회
      * @param nickname 조회할 닉네임

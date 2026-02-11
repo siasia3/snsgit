@@ -124,7 +124,7 @@ async function getFriends(){
 document.getElementById("friendSidebar").addEventListener('click',function (event){
     if (event.target && event.target.closest('.friendDiv')) {
         let nickname = event.target.closest('.friendDiv').querySelector('.customBoldFont').textContent;
-        window.location.href = `${BASE_URL}/user/${nickname}`
+        window.location.href = `/user/${nickname}`
     }
 })
 

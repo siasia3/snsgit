@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 application.yml
 application-local.yml
+application-prod.yml
 **/META-INF/MANIFEST.MF
 /src/main/resources/keys/
 

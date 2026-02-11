@@ -140,7 +140,7 @@
                 let chatroomId;
                 getChatroom(myId,receiverId).then(chatroom => {
                     chatroomId = chatroom.chatroomId;
-                    window.location.href = `${BASE_URL}/chat/${nickname}?chatroomId=${chatroomId}`;
+                    window.location.href = `/chat/${nickname}?chatroomId=${chatroomId}`;
                 });
             });
         }
@@ -228,7 +228,7 @@
 
         //프로필 편집 버튼 클릭이벤트
         document.getElementById('profileEdit').addEventListener('click',function(){
-            window.location.href = `${BASE_URL}/member/profile/edit`;
+            window.location.href = `/member/profile/edit`;
         })
 
     </script>

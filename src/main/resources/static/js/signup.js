@@ -3,7 +3,7 @@ const BASE_URL = 'https://horizonsns.com';
 //회원가입 닉네임 중복체크
 async function checkNickname(nickname){
     try {
-        let response = await fetch(`${BASE_URL}/api/member/check-nickname?nickname=${nickname}`);
+        let response = await fetch(`/api/member/check-nickname?nickname=${nickname}`);
 
         if (!response.ok) {
             if (response.status === 409) {
@@ -29,7 +29,7 @@ async function checkNickname(nickname){
 
 async function checkUserId(userId){
     try {
-        let response = await fetch(`${BASE_URL}/api/member/check-userId?userId=${userId}`);
+        let response = await fetch(`/api/member/check-userId?userId=${userId}`);
 
         if (!response.ok) {
             if (response.status === 409) {
@@ -53,7 +53,7 @@ async function checkUserId(userId){
 
 async function signup(formData){
     try {
-        const response = await fetch(`${BASE_URL}/api/member/signup`, {
+        const response = await fetch(`/api/member/signup`, {
             method: 'POST',
             body: formData
         });

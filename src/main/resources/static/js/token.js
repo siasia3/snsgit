@@ -2,7 +2,7 @@ const BASE_URL = 'https://horizonsns.com';
 
 async function refreshAccessToken() {
     try {
-        const response = await fetch(`${BASE_URL}/auth/refresh`, {
+        const response = await fetch(`/auth/refresh`, {
             method: 'POST',
             credentials: 'include', // 쿠키 사용 시 필요
         });
@@ -15,7 +15,7 @@ async function refreshAccessToken() {
         } else {
             //console.error('Refresh Token 만료 또는 유효하지 않음');
             alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-            window.location.href = `${BASE_URL}`; // 로그인 페이지로 리다이렉트
+            window.location.href = `/`; // 로그인 페이지로 리다이렉트
             return false;
         }
     } catch (error) {
@@ -27,7 +27,7 @@ async function refreshAccessToken() {
 
 async function logout() {
     try {
-        const response = await fetch(`${BASE_URL}/auth/logout`, {
+        const response = await fetch(`/auth/logout`, {
             method: 'POST',
             credentials: 'include', // 쿠키 사용 시 필요
         });
@@ -36,7 +36,7 @@ async function logout() {
             sessionStorage.removeItem("nickname");
             sessionStorage.removeItem("profileImage");
             sessionStorage.removeItem("userId");
-            window.location.href = `${BASE_URL}`;
+            window.location.href = `/`;
 
         }else {
             alert('잠시 후 다시 시도해주세요.');
@@ -53,7 +53,7 @@ async function fetchWithAuth(endpoint, options = {}) {
         if(!options.noSpinner){
             showLoadingSpinner();
         }
-        const response = await fetch(`${BASE_URL}${endpoint}`, {
+        const response = await fetch(`${endpoint}`, {
             ...options,
             credentials: 'include', // 쿠키를 요청에 포함
         });
@@ -68,7 +68,7 @@ async function fetchWithAuth(endpoint, options = {}) {
 
             if(refresh){
                 // 쿠키에 새 Access Token이 갱신되었으므로, 다시 요청
-                const retryResponse = await fetch(`${BASE_URL}${endpoint}`, {
+                const retryResponse = await fetch(`${endpoint}`, {
                     ...options,
                     credentials: 'include', // 쿠키 포함
                 });
@@ -98,7 +98,7 @@ async function fetchWithAuth(endpoint, options = {}) {
         if(error.status<500){
             throw new Error(error);
         }
-        window.location.href = `${BASE_URL}/error/500`;
+        window.location.href = `/error/500`;
     } finally {
         hideLoadingSpinner();
     }
@@ -107,10 +107,10 @@ async function fetchWithAuth(endpoint, options = {}) {
 function handleApiError(error){
     if (error.status >= 500) {
         // 서버 에러
-        window.location.href = `${BASE_URL}/error/500`;
+        window.location.href = `/error/500`;
     } else if (error.status === 401) {
         // 토큰 만료 또는 인증되지 않은 사용자
-        window.location.href = `${BASE_URL}/login`;
+        window.location.href = `/login`;
     } else {
         // 그 외 400번대;
         alert("잘못된 요청을 보내셨습니다.");

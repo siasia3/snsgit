@@ -45,13 +45,10 @@ public class SecurityConfig {
         //경로별 인가 작업
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/","/member/signup", "/resources/**","/auth/refresh"
-                ,"/api/member/check-userId","/api/member/check-nickname","/api/member/signup"
+                ,"/api/member/check-userId","/api/member/check-nickname","/api/member/signup","/api/login"
                 ).permitAll()
                 //.requestMatchers("/main").authenticated()
                 .anyRequest().authenticated());
-
-        //Form 로그인 방식
-        http.formLogin((auth) -> auth.loginPage("/").loginProcessingUrl("/process-login").successHandler(loginSuccessHandler).failureUrl("/"));
 
         //JWTFilter 추가
         http.addFilterBefore(new JWTFilter(jwtUtil,memberService), UsernamePasswordAuthenticationFilter.class);

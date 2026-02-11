@@ -10,17 +10,22 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <h2 class="text-center">로그인</h2>
-            <form th:action="@{/process-login}" method="post" class="mt-4">
+
+            <!-- 에러 메시지 표시 영역 -->
+            <div id="errorMessage" class="alert alert-danger mt-3" style="display: none;" role="alert"></div>
+
+            <form id="loginForm" class="mt-4">
                 <div class="mb-3">
                     <label for="username" class="form-label">아이디</label>
-                    <input type="text" id="username" name="username" class="form-control" required>
+                    <input type="text" id="username" name="username" class="form-control" required autocomplete="username">
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">비밀번호</label>
-                    <input type="password" id="password" name="password" class="form-control" required>
+                    <input type="password" id="password" name="password" class="form-control" required autocomplete="current-password">
                 </div>
                 <button type="submit" class="btn btn-primary w-100">로그인</button>
             </form>
+
             <div class="text-center mt-3">
                 <span>소셜 로그인</span>
                 <div class="d-flex justify-content-center mt-2">
@@ -28,6 +33,7 @@
                     <a th:href="@{/oauth2/authorization/google}" class="btn btn-danger mx-1">구글 로그인</a>
                 </div>
             </div>
+
             <div class="text-center mt-4">
                 <span>회원이 아니신가요?</span>
                 <a th:href="@{/member/signup}" class="text-decoration-none">회원가입</a>
@@ -35,6 +41,8 @@
         </div>
     </div>
 </div>
+
+<!-- 로그인 스크립트 -->
+<script th:src="@{/js/login.js}"></script>
 </body>
 </html>
-
