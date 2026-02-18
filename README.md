@@ -82,7 +82,7 @@ OAuth2 소셜 로그인, WebSocket 실시간 채팅, Redis 캐싱 등
 ### 인프라 자동화
 - **CI/CD:** GitHub Actions 파이프라인
 - **무중단 배포:** nginx 리버스 프록시
-- **클라우드:OCI
+- **클라우드:** OCI
 
 ---
 
