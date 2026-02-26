@@ -96,7 +96,7 @@ document.getElementById('postBtn').addEventListener('click', async (event) => {
         const result = await fetchWithAuth('/api/post',options);
         console.log('게시글 등록 성공:', result);
         document.getElementById('writeModal').classList.remove('show');
-        resetModifyModal();
+        resetWriteModal();
         alert('게시물이 성공적으로 등록되었습니다.');
 
 

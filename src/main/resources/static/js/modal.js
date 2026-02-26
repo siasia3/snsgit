@@ -41,6 +41,10 @@ detailCloseBtn.addEventListener('click', () => {
     if (content) {
         content.innerHTML = `<span class="customBoldFont small-pr-custom authorName"></span>`;
     }
+
+    // 댓글 입력창 비우기 (추가)
+    document.getElementById('detailCommentInput').value = '';
+    document.getElementById('detailCommentInput').nextElementSibling.style.display = 'none';
 });
 
 

@@ -160,8 +160,24 @@
     <script src="/js/reply.js" defer></script>
 
     <script>
-        window.addEventListener("load", function (){
-            pagingPosts();
+        window.addEventListener("load", async function (){
+            await pagingPosts();
+            const sentinel = document.getElementById("post-sentinel");
+
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    if (entries[0].isIntersecting) {
+                        pagingPosts();
+                    }
+                },
+                {
+                    root: null,
+                    rootMargin: "300px",
+                    threshold: 0
+                }
+            );
+
+            observer.observe(sentinel);
         });
 
         /*const OFFSET = 400;
@@ -175,22 +191,6 @@
         });*/
 
         // 스크롤 시 post 페이징 API 호출 (IntersectionObserver 방식)
-        const sentinel = document.getElementById("post-sentinel");
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting) {
-                    pagingPosts();
-                }
-            },
-            {
-                root: null,
-                rootMargin: "300px",
-                threshold: 0
-            }
-        );
-
-        observer.observe(sentinel);
 
         //게시글 목록 좋아요 클릭이벤트
         document.getElementById('mainDiv-inner').addEventListener('click', async (event) => {
@@ -322,6 +322,15 @@
                     });*/
                 detailModalOverlay.classList.remove('hidden');
 
+            }
+        });
+
+        //댓글 엔터 등록
+        document.getElementById('mainDiv-inner').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && event.target.classList.contains('comment-content')) {
+                if (event.target.value.trim() !== '') {
+                    event.target.nextElementSibling.click();
+                }
             }
         });
 

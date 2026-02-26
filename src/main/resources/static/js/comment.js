@@ -88,6 +88,19 @@ document.getElementById('postDetailModal').addEventListener('click', async funct
                 let commentInner = document.getElementById('comment-inner');
                 let parentComment = commentInner.querySelector(`[data-comment-id="${result.parentId}"]`);
                 let replyInner = parentComment.querySelector('.replyInner');
+
+                if (!replyInner) {
+                    let replyAreaTemplate = document.getElementById('postComment-template').content.querySelector('.reply-area').cloneNode(true);
+                    let replySeeMore = replyAreaTemplate.querySelector('.replySeeMore');
+                    replySeeMore.classList.remove('replySeeMore');
+                    replySeeMore.classList.add('replySee');
+                    replySeeMore.style.display = 'none';
+                    replyAreaTemplate.querySelector('.replyCount').innerText = 1;
+                    replyAreaTemplate.querySelector('.replyHide').style.display = 'block';
+                    parentComment.querySelector('.post-comment-content').appendChild(replyAreaTemplate);
+                    replyInner = parentComment.querySelector('.replyInner');
+                }
+
                 const reply = [result];
                 renderReply(reply,replyInner);
                 if(replyInner.style.display === 'none'){
@@ -105,6 +118,15 @@ document.getElementById('postDetailModal').addEventListener('click', async funct
         targetPost.querySelector('.comment-content').value = '';
     }
 
+});
+
+//게시글 상세페이지 댓글 엔터 등록
+document.getElementById('postDetailModal').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' && event.target.classList.contains('comment-content')) {
+        if (event.target.value.trim() !== '') {
+            event.target.nextElementSibling.click();
+        }
+    }
 });
 
 

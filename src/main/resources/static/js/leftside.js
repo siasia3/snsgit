@@ -5,6 +5,7 @@
 function closeCreateModal() {
     const modal = document.getElementById('writeModal');
     modal.classList.remove('show'); // show 클래스를 제거하여 모달 숨기기
+    resetWriteModal();
 }
 function closeUpdateModal() {
     const modal = document.getElementById('modifyModal');
