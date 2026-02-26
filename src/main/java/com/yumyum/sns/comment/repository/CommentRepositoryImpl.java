@@ -48,7 +48,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                         comment.content,
                         comment.createdAt,
                         member.id,
-                        member.name,
+                        member.nickname,
                         member.profileImage,
                         JPAExpressions
                                 .select(child.count()) // 대댓글 개수 조회
@@ -82,7 +82,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
         List<ReplyDto> replies = queryFactory
                 .select(new QReplyDto(
                         comment.id,
-                        member.name,
+                        member.nickname,
                         comment.content,
                         member.id,
                         member.profileImage,

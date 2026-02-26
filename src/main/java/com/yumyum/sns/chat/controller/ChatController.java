@@ -1,6 +1,7 @@
 package com.yumyum.sns.chat.controller;
 
 import com.yumyum.sns.chat.dto.ChatResponse;
+import com.yumyum.sns.chat.dto.ChatRoomListResponse;
 import com.yumyum.sns.chat.dto.ChatRoomResponse;
 import com.yumyum.sns.chat.dto.DirectChatMemRequest;
 import com.yumyum.sns.chat.service.ChatRoomService;
@@ -43,5 +44,11 @@ public class ChatController {
         return ResponseEntity.ok(chats);
     }
 
+    //내 채팅방 목록 조회
+    @GetMapping("/chatrooms/me")
+    public ResponseEntity<List<ChatRoomListResponse>> getMyChatRooms(@RequestParam Long memberId) {
+        List<ChatRoomListResponse> chatRooms = chatRoomService.getMyChatRooms(memberId);
+        return ResponseEntity.ok(chatRooms);
+    }
 
 }

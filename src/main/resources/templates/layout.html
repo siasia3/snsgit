@@ -47,6 +47,7 @@
 
 <div th:replace="~{modal/createPostModal :: createPostModal}"></div>
 <div th:replace="~{modal/updatePostModal :: updatePostModal}"></div>
+<div th:replace="~{modal/messageModal :: messageModal}"></div>
 
 
 <script src="/js/leftside.js"></script>
@@ -55,6 +56,10 @@
 <script src="/js/currentMember.js"></script>
 <script src="/js/friend.js"></script>
 <script src="/js/post.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script src="/js/chat.js" defer></script>
+<script src="/js/messageModal.js"></script>
 
 <th:block layout:fragment="script"></th:block>
 <script>
@@ -82,6 +87,11 @@
             let nickname = preview.querySelector('.previewNickName').textContent;
             window.location.href = `/user/${nickname}`;
         }
+    });
+
+    //메시지 모달
+    document.getElementById('messagePage').addEventListener('click',function (){
+        openMessageModal();
     });
 
     //친구요청 페이지

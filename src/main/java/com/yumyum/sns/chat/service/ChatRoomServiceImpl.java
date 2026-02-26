@@ -1,5 +1,6 @@
 package com.yumyum.sns.chat.service;
 
+import com.yumyum.sns.chat.dto.ChatRoomListResponse;
 import com.yumyum.sns.chat.dto.DirectChatMemRequest;
 import com.yumyum.sns.chat.dto.ChatRoomResponse;
 import com.yumyum.sns.chat.entity.ChatRoom;
@@ -55,5 +56,9 @@ public class ChatRoomServiceImpl implements ChatRoomService{
                 .orElseThrow(() -> new ChatRoomNotFoundException(chatRoomId));
     }
 
+    @Override
+    public List<ChatRoomListResponse> getMyChatRooms(Long memberId) {
+        return chatRoomRepository.findMyChatRooms(memberId);
+    }
 
 }

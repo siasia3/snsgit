@@ -1,14 +1,15 @@
 package com.yumyum.sns.chat.service;
 
 import com.yumyum.sns.chat.dto.ChatRoomDto;
+import com.yumyum.sns.chat.dto.ChatRoomListResponse;
 import com.yumyum.sns.chat.dto.DirectChatMemRequest;
 import com.yumyum.sns.chat.dto.ChatRoomResponse;
 import com.yumyum.sns.chat.entity.ChatRoom;
 import com.yumyum.sns.chat.entity.ChatRoomType;
 
+import java.util.List;
+
 public interface ChatRoomService {
-
-
 
     /**
      * 1:1 채팅방 유무를 확인하고 없으면 생성
@@ -31,6 +32,11 @@ public interface ChatRoomService {
      */
     ChatRoom checkChatRoom(Long chatRoomId);
 
-
+    /**
+     * 내가 속한 채팅방 목록 조회
+     * @param memberId 내 memberId
+     * @return 채팅방 목록 (상대방 정보 + 마지막 메시지 포함)
+     */
+    List<ChatRoomListResponse> getMyChatRooms(Long memberId);
 
 }

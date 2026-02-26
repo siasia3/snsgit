@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="messageModal">
+
+    <!-- 메시지 모달 -->
+    <div id="messageModal" class="message-modal-overlay" style="display:none;">
+        <div class="message-modal-container">
+
+            <!-- 왼쪽: 채팅방 목록 -->
+            <div class="message-modal-list">
+                <div class="message-modal-list-header">
+                    <span class="customBoldFont">메시지</span>
+                </div>
+                <div id="chatroomList" class="chatroom-list">
+                    <!-- JS로 채팅방 목록 렌더링 -->
+                </div>
+            </div>
+
+            <!-- 오른쪽: 채팅 영역 -->
+            <div class="message-modal-chat" id="modalChatArea">
+                <div class="message-modal-chat-empty" id="modalChatEmpty">
+                    <i class="fa-regular fa-message" style="font-size:2rem; color:#ccc;"></i>
+                    <p style="color:#aaa; margin-top:0.5rem;">대화를 선택해주세요</p>
+                </div>
+
+                <!-- 채팅 헤더 (선택 후 표시) -->
+                <div class="message-modal-chat-header" id="modalChatHeader" style="display:none;">
+                    <div class="profile-div">
+                        <img id="modalReceiverImg" src="/image/basicProfile.jpg" class="receiver-img">
+                    </div>
+                    <span id="modalReceiverName" class="customBoldFont"></span>
+                </div>
+
+                <!-- 채팅 메시지 영역 -->
+                <div id="modalChatMessages" style="display:none;">
+                </div>
+
+                <!-- 입력창 -->
+                <div id="modalInputArea" style="display:none;">
+                    <div class="message-input-inner">
+                        <input id="modalMessageInput" type="text" placeholder=" 메시지를 입력하세요..." />
+                        <div id="modalMessagePostBtn" class="messagePostBtn customBoldFont">Send</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 닫기 버튼 -->
+            <div id="messageModalClose" class="message-modal-close">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 채팅 시간 템플릿 (모달용) -->
+    <template id="modalChatTimeTemplate">
+        <div class="time-div">
+            <div class="chatTime" id="timeArea">
+            </div>
+        </div>
+    </template>
+    <template id="modalReceiverMessage">
+        <div class="receiver-message-div">
+            <div class="profile-div">
+                <img src="/image/basicProfile.jpg" class="receiver-img">
+            </div>
+            <div class="receiver-message message">
+            </div>
+        </div>
+    </template>
+    <template id="modalSenderMessage">
+        <div class="sender-message-div">
+            <div class="sender-message message">
+            </div>
+        </div>
+    </template>
+
+</div>
+</body>
+</html>

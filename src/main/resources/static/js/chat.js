@@ -2,7 +2,7 @@ function connect(chatroomId) {
 
     let socket = new SockJS("/ws-chat");
     stompClient = Stomp.over(socket);
-    stompClient.connect({}, () => onConnected(chatroomId), onError(chatroomId));
+    stompClient.connect({}, () => onConnected(chatroomId), () => onError(chatroomId));
 
     socket.onclose = (event) => {
         if (!event.wasClean) {

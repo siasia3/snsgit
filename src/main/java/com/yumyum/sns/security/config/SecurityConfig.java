@@ -46,8 +46,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/","/member/signup", "/resources/**","/auth/refresh"
                 ,"/api/member/check-userId","/api/member/check-nickname","/api/member/signup","/api/login"
+                ,"/error/home", "/error/500"
                 ).permitAll()
-                //.requestMatchers("/main").authenticated()
                 .anyRequest().authenticated());
 
         //JWTFilter 추가
