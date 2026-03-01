@@ -48,6 +48,7 @@ OAuth2 소셜 로그인, WebSocket 실시간 채팅, Redis 등
 - 태그 기능
 - 좋아요 기능
 - 커서 기반 페이징 (무한 스크롤)
+- 파일 업로드 정합성 보장 (Outbox Pattern)
 
 ### 3. 댓글 시스템
 - 댓글/대댓글 작성
@@ -68,6 +69,7 @@ OAuth2 소셜 로그인, WebSocket 실시간 채팅, Redis 등
 ### 성능 최적화
 - **N+1 문제 해결:** QueryDSL Fetch Join 활용
 - **페이징 최적화:** 커서 기반 페이징으로 대용량 데이터 처리
+- **스토리지 정합성:** Outbox Pattern으로 deleteFile 실패 시 고아 파일 문제 해결
 
 ### 보안
 - **OAuth2 소셜 로그인:** Google, Naver 연동
@@ -91,8 +93,7 @@ OAuth2 소셜 로그인, WebSocket 실시간 채팅, Redis 등
 ---
 
 ## 📊 ERD
-
-<img width="945" height="567" alt="snserd" src="https://github.com/user-attachments/assets/64810d25-598b-4f88-8d56-9db71389d388" />
+<img width="1303" height="798" alt="snserd" src="https://github.com/user-attachments/assets/41f9080d-e122-40ce-b2ef-670c51bc4669" />
 
 ---
 
