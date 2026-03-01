@@ -449,7 +449,7 @@ function createPostDetailInfo(post){
 
     if(post.profileImage){
         /*이미지 파일이 있는 경우*/
-        const profileElements = postDetail.querySelectorAll('.profile-img');
+        const profileElements = postDetail.querySelectorAll('.writerInfo .profile-img, #modalPostContent .profile-img');
         profileElements.forEach(element => {
             element.src = post.profileImage;
         });
