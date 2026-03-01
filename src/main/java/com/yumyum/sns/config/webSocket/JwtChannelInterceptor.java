@@ -24,7 +24,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
             if (sessionAttributes != null) {
                 Object identifier = sessionAttributes.get("identifier");
                 if (identifier != null) {
-                    // 예: Principal 구현 후 setUser
+                    // Principal 구현 후 setUser
                     accessor.setUser(new Principal() {
                         @Override
                         public String getName() {

@@ -14,7 +14,6 @@ document.getElementById('modifyFileInput').addEventListener('change', (event) =>
 });
 
 
-
 //파일 미리보기 렌더링
 function renderFilePreview(modal,files){
     const carouselItems = modal.querySelector('.carouselItems');
@@ -94,10 +93,8 @@ document.getElementById('postBtn').addEventListener('click', async (event) => {
         };
 
         const result = await fetchWithAuth('/api/post',options);
-        console.log('게시글 등록 성공:', result);
-        document.getElementById('writeModal').classList.remove('show');
-        resetWriteModal();
-        alert('게시물이 성공적으로 등록되었습니다.');
+        const nickname = sessionStorage.getItem('nickname');
+        window.location.href = '/user/' + nickname;
 
 
     } catch (error) {
@@ -130,9 +127,8 @@ document.getElementById('updateBtn').addEventListener('click', async (event) => 
 
     let result = await updatePost(formData,postId);
     if(result.success) {
-        document.getElementById('modifyModal').classList.remove('show');
-        resetModifyModal();
-        alert('게시물이 성공적으로 수정되었습니다.');
+        const nickname = sessionStorage.getItem('nickname');
+        window.location.href = '/user/' + nickname;
     }
 });
 
@@ -438,10 +434,19 @@ function renderPosts(data){
 function createPostDetailInfo(post){
     let postDetail = document.querySelector('.postDetail-modal-content');
     postDetail.setAttribute('data-post-id',post.postId);
+
+    const postOptions = postDetail.querySelector('.post-options');
+    if (sessionStorage.getItem('userId') == post.memberId) {
+        postOptions.style.display = 'flex';
+    } else {
+        postOptions.style.display = 'none';
+    }
+
     const authorElements = postDetail.querySelectorAll('.authorName');
     authorElements.forEach(element => {
         element.innerText = post.author;
     });
+
     if(post.profileImage){
         /*이미지 파일이 있는 경우*/
         const profileElements = postDetail.querySelectorAll('.profile-img');

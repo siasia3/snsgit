@@ -91,7 +91,6 @@
     <script src="/js/like.js" defer></script>
     <script src="/js/reply.js" defer></script>
     <script>
-        let userId;
         let DMButton = document.getElementById('DMBtn');
         let myId = sessionStorage.getItem('userId');
 
@@ -115,14 +114,18 @@
         let nickname = nicknameMatch[1];
 
         window.addEventListener("load", async () => {
-            let userData = await loadUserInfo(nickname);
-            friendMemId = userData.memberId;
-            renderUserInfo(userData);
-            let friendRequestState = await friendRequestCheck(myId,friendMemId)
-            renderFriendRequestByUser(friendRequestState);
-            let userPost = await pagingUserPosts(nickname);
-            renderUserPosts(userPost);
-            observer.observe(sentinel);
+            try {
+                let userData = await loadUserInfo(nickname);
+                friendMemId = userData.memberId;
+                let friendRequestState = await friendRequestCheck(myId, friendMemId)
+                let userPost = await pagingUserPosts(nickname);
+                renderUserInfo(userData);
+                renderFriendRequestByUser(friendRequestState);
+                renderUserPosts(userPost);
+                observer.observe(sentinel);
+            }catch (error){
+                if (error.message === '404') window.location.href = '/error/404';
+            }
         });
 
         const sentinel = document.getElementById("post-sentinel");

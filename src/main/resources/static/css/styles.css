@@ -570,6 +570,7 @@ span.fa-comment {
     flex-direction: row;
     padding: 0;
     height: 55rem;
+    overflow: hidden;
 }
 
 .post-media{
@@ -581,6 +582,8 @@ span.fa-comment {
     flex-direction: column;
     width: 42%;
     height: 100%;
+    border-radius: 0 0.5rem 0 0;
+    overflow: hidden;
 }
 .post-comment::-webkit-scrollbar {
     display: none;

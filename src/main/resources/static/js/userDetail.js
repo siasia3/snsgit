@@ -5,7 +5,11 @@ function loadUserInfo(nickname){
         method: 'GET'
     };
     return fetchWithAuth(`/api/search/user/${nickname}`,options)
-        .then(response => response.json());
+        .then(response => {
+            if (response.status === 404) throw new Error('404');
+            if (!response.ok) throw new Error('500');
+            return response.json();
+        });
 }
 
 let userPage = 0;
