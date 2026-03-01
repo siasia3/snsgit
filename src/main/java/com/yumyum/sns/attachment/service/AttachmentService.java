@@ -13,10 +13,10 @@ public interface AttachmentService {
 
     /**
      * 첨부파일 생성
-     * @param files 생성할 첨부파일들
+     * @param fileNames cloud storage에 등록된 파일 이름 url
      * @return 썸네일 url 및 파일 정보가 포함된 DTO
      */
-    ThumbnailResponse createAttachment(List<MultipartFile> files);
+    ThumbnailResponse createAttachment(List<AttachDto> fileNames);
 
 
     /**

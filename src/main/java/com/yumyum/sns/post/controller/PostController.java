@@ -50,7 +50,7 @@ public class PostController {
         }
 
         String identifier = jwtUtil.getUsername(jwt);
-        postFacadeService.registerPost(postRequestDto,files,identifier);
+        Long postId = postFacadeService.registerPost(postRequestDto, files, identifier);
 
         return ResponseEntity.ok(Map.of("message","게시글이 정상적으로 작성되었습니다."));
     }

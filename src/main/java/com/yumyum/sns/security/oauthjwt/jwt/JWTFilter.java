@@ -93,8 +93,8 @@ public class JWTFilter extends OncePerRequestFilter {
 
             //ssr 기반 화면요청이면서 리프레쉬 유효한 경우
             if(!jwtUtil.isExpired(refreshToken)){
-                String newAccessToken = jwtUtil.createJwt(jwtUtil.getUsername(refreshToken), "ROLE_USER", 30 * 1000L);
-                response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken));
+                String newAccessToken = jwtUtil.createJwt(jwtUtil.getUsername(refreshToken), "ROLE_USER", 30 * 60 * 1000L);
+                response.addHeader("Set-Cookie", jwtUtil.createCookie("Authorization", newAccessToken).toString());
                 accessToken = newAccessToken;
             }
 

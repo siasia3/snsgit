@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 
 import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,6 +15,12 @@ import java.util.Date;
 
 @Component
 public class JWTUtil {
+
+    @Value("${cookie.secure}")
+    private boolean secure;
+
+    @Value("${cookie.samesite}")
+    private String sameSite;
 
     private SecretKey secretKey;
 
@@ -74,13 +81,24 @@ public class JWTUtil {
     }
 
     //나중에 쿠키 시간 파라미터 추가
-    public Cookie createCookie(String key, String value) {
+    public ResponseCookie createCookie(String key, String value) {
+        return ResponseCookie.from(key, value)
+                .maxAge(24*60*60)
+                .secure(secure)
+                .path("/")
+                .httpOnly(true)
+                .sameSite(sameSite)
+                .build();
+    }
 
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24*60*60);
-        //cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        return cookie;
+    //로그아웃 시 만료된 쿠키 생성
+    public ResponseCookie createExpiredCookie(String key) {
+        return ResponseCookie.from(key, "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .secure(secure)
+                .sameSite(sameSite)
+                .build();
     }
 }

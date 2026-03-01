@@ -11,7 +11,7 @@ public interface StorageService {
     //단일 파일 업로드
     String uploadFile(MultipartFile file);
     //단일 파일 삭제
-    void deleteFile(String objectName);
+    boolean deleteFile(String objectName);
     //다중 파일 삭제
     void deleteFiles(List<String> objectNames);
 

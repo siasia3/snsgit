@@ -95,12 +95,13 @@ public class S3StorageService implements StorageService {
 
     //s3 단일파일 삭제
     @Override
-    public void deleteFile(String fileName){
+    public boolean deleteFile(String fileName){
         try{
             s3Operations.deleteObject(bucket,fileName);
+            return true;
         }catch (S3Exception e){
             log.error("s3 파일 삭제 실패");
-            throw new S3DeleteException("S3 파일 삭제 실패");
+            return false;
         }
 
     }

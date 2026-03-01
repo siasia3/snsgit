@@ -41,8 +41,8 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         String refreshToken = jwtUtil.createRefreshToken(username,3*60*60*1000L);
         tokenService.saveRefreshToken(username,refreshToken,3*60*60*1000L);
 
-        response.addCookie(jwtUtil.createCookie("Authorization", accessToken));
-        response.addCookie(jwtUtil.createCookie("refreshToken", refreshToken));
+        response.addHeader("Set-Cookie", jwtUtil.createCookie("Authorization", accessToken).toString());
+        response.addHeader("Set-Cookie", jwtUtil.createCookie("refreshToken", refreshToken).toString());
         response.sendRedirect("/main");
     }
 

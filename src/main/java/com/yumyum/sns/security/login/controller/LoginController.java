@@ -33,8 +33,8 @@ public class LoginController {
         String refreshToken = jwtUtil.createRefreshToken(member.getIdentifier(),3*60*60*1000L);
         tokenService.saveRefreshToken(member.getIdentifier(),refreshToken,3*60*60*1000L);
 
-        response.addCookie(jwtUtil.createCookie("Authorization", accessToken));
-        response.addCookie(jwtUtil.createCookie("refreshToken", refreshToken));
+        response.addHeader("Set-Cookie", jwtUtil.createCookie("Authorization", accessToken).toString());
+        response.addHeader("Set-Cookie", jwtUtil.createCookie("refreshToken", refreshToken).toString());
 
         return ResponseEntity.ok().build();
     }

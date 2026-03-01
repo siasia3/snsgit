@@ -13,8 +13,9 @@ public interface PostFacadeService {
      * @param postRequestDto 등록할 게시글 DTO
      * @param files 등록할 첨부파일
      * @param identifier 회원 식별자
+     * @return 게시글 pk
      */
-    void registerPost(PostRequestDto postRequestDto, List<MultipartFile> files, String identifier);
+    Long registerPost(PostRequestDto postRequestDto, List<MultipartFile> files, String identifier);
 
     /**
      * 파일수정,게시글수정,해시태그수정 서비스를 호출

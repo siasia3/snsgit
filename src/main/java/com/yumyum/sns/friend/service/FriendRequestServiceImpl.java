@@ -18,13 +18,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class FriendRequestServiceImpl implements FriendRequestService{
 
     private final FriendRequestRepository friendRequestRepository;
     private final MemberService memberService;
 
     //받은 친구요청 조회
+    @Transactional(readOnly = true)
     @Override
     public List<ReceivedFriendRequestDto> getReceivedFriendReqs(Long receiverId) {
         memberService.getMemberById(receiverId);
@@ -33,6 +33,7 @@ public class FriendRequestServiceImpl implements FriendRequestService{
 
     //보낸 친구요청 조회
     @Override
+    @Transactional(readOnly = true)
     public List<SentFriendRequestDto> getSentFriendReqs(Long senderId) {
         memberService.getMemberById(senderId);
         return friendRequestRepository.findFriendRequestsBySender(senderId);
@@ -40,6 +41,7 @@ public class FriendRequestServiceImpl implements FriendRequestService{
 
     // 친구요청 거절, 취소 또는 친구삭제
     @Override
+    @Transactional
     public void deleteFriendReq(Long friendRequestId) {
         FriendRequest friendRequest = getFriendRequestById(friendRequestId);
         friendRequestRepository.delete(friendRequest);
@@ -47,12 +49,14 @@ public class FriendRequestServiceImpl implements FriendRequestService{
 
     // 친구 삭제시 친구요청 삭제(사용X)
     @Override
+    @Transactional
     public void removeFriendRequestOnFriendRemoval(Long myId, Long memberId) {
         friendRequestRepository.deleteFriendRequestOnFriendRemoval(myId,memberId);
     }
 
     // 친구요청 생성(insert)
     @Override
+    @Transactional
     public FriendRequestResDto createFriendRequest(Long senderId, Long receiverId) {
         Member receiver = memberService.getMemberById(receiverId);
         Member sender = memberService.getMemberById(senderId);
@@ -63,12 +67,14 @@ public class FriendRequestServiceImpl implements FriendRequestService{
 
     //친구요청 단건조회 및 예외
     @Override
+    @Transactional(readOnly = true)
     public FriendRequest getFriendRequestById(Long friendRequestId) {
         return friendRequestRepository.findById(friendRequestId).orElseThrow((() -> new FriendRequestNotFoundException(friendRequestId)));
     }
 
     //친구요청 상태 확인
     @Override
+    @Transactional(readOnly = true)
     public Optional<FriendRequestResDto> getFriendRequestIdByMemberIds(Long myId, Long userId) {
         Member myMember = memberService.getMemberById(myId);
         Member userMember = memberService.getMemberById(userId);
@@ -81,6 +87,7 @@ public class FriendRequestServiceImpl implements FriendRequestService{
 
     //친구요청 수락(update)
     @Override
+    @Transactional
     public FriendRequestResDto acceptFriendRequest(Long friendRequestId) {
         FriendRequest friendRequest = getFriendRequestById(friendRequestId);
         friendRequest.changeFriendRequestState(FriendRequestStatus.ACCEPTED);

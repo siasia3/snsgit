@@ -9,6 +9,7 @@ import com.yumyum.sns.error.exception.FileUploadException;
 import com.yumyum.sns.error.exception.OCIDeleteException;
 import com.yumyum.sns.error.exception.OCIUploadException;
 import com.yumyum.sns.infra.StorageService;
+import com.yumyum.sns.infra.service.StorageDeleteOutboxService;
 import io.awspring.cloud.s3.S3Exception;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -99,7 +100,7 @@ public class OciStorageService implements StorageService {
 
             return urlPrefix + namespace + "/b/" + bucketName + "/o/" + uniqueFileName;
         }catch (IOException e) {
-            log.error("s3 파일 업로드 실패");
+            log.error("storage 파일 업로드 실패");
             throw new FileUploadException("파일 업로드 실패: "+ fileName);
         }catch (BmcException e){
             throw new OCIUploadException("OCI 파일 업로드 실패");
@@ -108,7 +109,7 @@ public class OciStorageService implements StorageService {
 
     //OCI Storage 파일 삭제
     @Override
-    public void deleteFile(String objectName) {
+    public boolean deleteFile(String objectName) {
         DeleteObjectRequest request = DeleteObjectRequest.builder()
                 .namespaceName(namespace)
                 .bucketName(bucketName)
@@ -117,13 +118,17 @@ public class OciStorageService implements StorageService {
 
         try {
             objectStorage.deleteObject(request);
+            return true;
         } catch (BmcException e) {
-            log.error("s3 파일 삭제 실패");
+            log.error("storage 파일 삭제 실패");
             if (e.getStatusCode() == 404) {
-                throw new OCIDeleteException("객체가 존재하지 않습니다: " + objectName);
+                log.warn("이미 존재하지 않는 객체: " + objectName);
+                return true;
             } else {
-                throw new OCIDeleteException("객체: "+objectName+" 삭제 실패: " + e.getMessage());
+                log.error("고아 파일 발생 - 삭제 필요: " + objectName);
+                return false;
             }
+
         }
     }
 

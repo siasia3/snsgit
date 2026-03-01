@@ -105,6 +105,7 @@ public class PostServiceImpl implements PostService{
 
     //회원이 작성한 게시글 조회
     @Override
+    @Transactional(readOnly = true)
     public MemberPostPageDto getMemberPosts(Pageable pageable, String nickName) {
         Member member = memberService.getMemberByNickname(nickName);
         List<MemberPostDto> memberPosts = postRepository.findMemberPosts(pageable, member.getId());
@@ -113,6 +114,7 @@ public class PostServiceImpl implements PostService{
 
     //게시글과 첨부파일 상세조회
     @Override
+    @Transactional(readOnly = true)
     public PostDetailDto getPostDetailWithInfo(Long memberId, Long postId) {
         PostDetailDto postDetail = getPostDetail(postId, memberId);
         List<AttachwithDetailDto> attachment = attachmentService.getAttachmentByPostDetail(postId);
@@ -122,6 +124,7 @@ public class PostServiceImpl implements PostService{
 
     //회원 좋아요 게시글 조회
     @Override
+    @Transactional(readOnly = true)
     public CursorPageResponse getLikedPosts(int pageSize, LocalDateTime cursorCreatedAt, Long memberId) {
         memberService.getMemberById(memberId);
         List<LikedPostDto> likedPosts = postRepository.findLikedPosts(pageSize, cursorCreatedAt, memberId);
@@ -133,6 +136,7 @@ public class PostServiceImpl implements PostService{
 
     //게시글 첨부파일 조회
     @Override
+    @Transactional(readOnly = true)
     public PostDTO getPost(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
         List<AttachwithDetailDto> attachment = attachmentService.getAttachmentByPostDetail(postId);

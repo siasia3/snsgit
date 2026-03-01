@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService{
 
@@ -29,6 +28,7 @@ public class CommentServiceImpl implements CommentService{
 
     //댓글 등록
     @Override
+    @Transactional
     public CommentResponseDto createComment(CommentRequestDto commentRequestDto, String identifier) {
         Member member = memberService.getMemberByIdentifier(identifier);
         Post post = postService.getPostById(commentRequestDto.getPostId());
@@ -46,6 +46,7 @@ public class CommentServiceImpl implements CommentService{
 
     //게시글 리스트의 각 댓글개수
     @Override
+    @Transactional(readOnly = true)
     public Map<Long, CommentCntDto> getCommentCntsByPostIds(List<Long> postIds) {
         List<CommentCntDto> totalCommentCnts = commentRepository.findCommentCntsByPostIds(postIds);
         Map<Long, CommentCntDto> totalCommentCntMap = totalCommentCnts.stream().collect(Collectors.toMap(CommentCntDto::getPostId, comment -> comment));
@@ -54,6 +55,7 @@ public class CommentServiceImpl implements CommentService{
 
     //특정 게시글의 댓글조회
     @Override
+    @Transactional(readOnly = true)
     public CommentSliceDto getCommentsByPost(Pageable pageable, Long postId) {
         List<CommentDto> commentsByPost = commentRepository.findCommentsByPost(pageable, postId);
         return new CommentSliceDto(commentsByPost,pageable);
@@ -61,6 +63,7 @@ public class CommentServiceImpl implements CommentService{
 
     //댓글 삭제
     @Override
+    @Transactional
     public Long deleteComment(Long commentId, String identifier) {
         Comment comment = commentRepository.findByIdWithMember(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
         Member member = memberService.getMemberByIdentifier(identifier);
@@ -73,6 +76,7 @@ public class CommentServiceImpl implements CommentService{
 
     //대댓글 조회
     @Override
+    @Transactional(readOnly = true)
     public ReplySliceDto getRepliesByComment(Pageable pageable, Long parentId) {
         List<ReplyDto> replies = commentRepository.findRepliesByComment(pageable, parentId);
 

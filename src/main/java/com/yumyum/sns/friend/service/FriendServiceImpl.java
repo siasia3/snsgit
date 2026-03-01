@@ -14,7 +14,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class FriendServiceImpl implements FriendService{
 
     private final MemberService memberService;
@@ -22,6 +21,7 @@ public class FriendServiceImpl implements FriendService{
 
     //친구 목록 조회
     @Override
+    @Transactional(readOnly = true)
     public List<FriendResDto> getFriendsByMemberId(Long myId) {
         //id 유효성 체크
         Member member = memberService.getMemberById(myId);
@@ -30,6 +30,7 @@ public class FriendServiceImpl implements FriendService{
 
     //친구 생성
     @Override
+    @Transactional
     public Long createFriend(Long senderId,Long receiverId) {
         Member memberA = memberService.getMemberById(senderId);
         Member memberB = memberService.getMemberById(receiverId);
@@ -40,6 +41,7 @@ public class FriendServiceImpl implements FriendService{
 
     // friendId를 이용한 친구 삭제
     @Override
+    @Transactional
     public void removeFriendByFriendId(Long friendId) {
         Friend friend = getFriendById(friendId);
         friendRepository.delete(friend);
@@ -47,6 +49,7 @@ public class FriendServiceImpl implements FriendService{
 
     // 친구관계인 회원Id를 이용한 친구삭제
     @Override
+    @Transactional
     public void removeFriendByMemberId(Long senderId, Long receiverId) {
         friendRepository.deleteFriend(senderId,receiverId);
     }
@@ -57,6 +60,7 @@ public class FriendServiceImpl implements FriendService{
 
     // 친구 단건 조회
     @Override
+    @Transactional(readOnly = true)
     public Friend getFriendById(Long friendId) {
         return friendRepository.findById(friendId).orElseThrow(()-> new FriendNotFoundException(friendId));
     }

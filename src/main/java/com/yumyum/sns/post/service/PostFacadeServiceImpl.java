@@ -6,6 +6,7 @@ import com.yumyum.sns.attachment.dto.ThumbnailResponse;
 import com.yumyum.sns.attachment.entity.Attachment;
 import com.yumyum.sns.attachment.service.AttachmentService;
 import com.yumyum.sns.comment.service.CommentService;
+import com.yumyum.sns.infra.StorageService;
 import com.yumyum.sns.member.entity.Member;
 import com.yumyum.sns.member.service.MemberService;
 import com.yumyum.sns.post.dto.*;
@@ -23,7 +24,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class PostFacadeServiceImpl implements PostFacadeService{
 
@@ -31,29 +31,24 @@ public class PostFacadeServiceImpl implements PostFacadeService{
     private final PostService postService;
     private final TagService tagService;
     private final AttachmentService attachmentService;
+    private final StorageService storageService;
+    private final PostTransactionService postTransactionService;
 
     // 파일, 게시판, 해시태그 생성
     @Override
-    public void registerPost(PostRequestDto postRequestDto, List<MultipartFile> files, String identifier) {
+    public Long registerPost(PostRequestDto postRequestDto, List<MultipartFile> files, String identifier) {
         Member checkMember = memberService.getMemberByIdentifier(identifier);
-        Attachment attachment = new Attachment();
-        List<TagDto> hashtags = postRequestDto.getHashtags();
+        //storage 업로드
+        List<AttachDto> attachDtos = storageService.uploadFiles(files);
 
-        //첨부파일 insert
-        ThumbnailResponse createdAttach = attachmentService.createAttachment(files);
-        //게시판 insert
-        Post post = postService.createPost(postRequestDto,checkMember,createdAttach);
-
-        //해시태그가 있는 경우 insert
-        if(hashtags != null && !hashtags.isEmpty()){
-            for(TagDto hashtag : hashtags){
-                tagService.createTag(hashtag,post);
-            }
-        }
+        //게시글 등록
+        Long postId = postTransactionService.savePost(postRequestDto, attachDtos, checkMember);
+        return postId;
     }
 
     //파일,게시판,해시태그 수정
     @Override
+    @Transactional
     public PostUpdateResponseDTO modifyPost(PostUpdateRequestDTO postUpdateRequestDto, List<MultipartFile> files, String identifier) {
         Member checkMember = memberService.getMemberByIdentifier(identifier);
         List<TagDto> hashtags = postUpdateRequestDto.getHashtags();
@@ -80,6 +75,7 @@ public class PostFacadeServiceImpl implements PostFacadeService{
 
     //게시글 과 게시글 관련 정보 페이징 조회
     @Override
+    @Transactional(readOnly = true)
     public PostSliceDto getPostsWithInfo(PostCursorRequest cursor, Long memberId) {
         //toOne 관계 페이징조회
         List<PostResponseDTO> pagingPosts = postService.getPagingPosts(cursor, memberId);

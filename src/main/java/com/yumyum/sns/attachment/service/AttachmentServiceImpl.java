@@ -10,6 +10,7 @@ import com.yumyum.sns.attachment.repository.AttachmentRepository;
 import com.yumyum.sns.error.exception.AttachmentNotFoundException;
 import com.yumyum.sns.infra.RollbackManager;
 import com.yumyum.sns.infra.StorageService;
+import com.yumyum.sns.infra.service.StorageDeleteOutboxService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,21 +21,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class AttachmentServiceImpl implements AttachmentService {
 
     private final RollbackManager rollbackManager;
     private final StorageService storageService;
+    private final StorageDeleteOutboxService storageDeleteOutboxService;
     private final AttachmentRepository attachmentRepository;
     private final AttachmentDetailRepository attachmentDetailRepository;
 
     //Attachment와 AttachmentDetail insert
     @Override
-    public ThumbnailResponse createAttachment(List<MultipartFile> files) {
+    @Transactional
+    public ThumbnailResponse createAttachment(List<AttachDto> attachDtos) {
 
-        //storage 업로드
-        List<AttachDto> attachDtos = storageService.uploadFiles(files);
         //롤백시 storage 정리
         rollbackManager.deleteIfTransactionRollback(storageService.toSavedFileNames(attachDtos));
 
@@ -71,6 +71,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     //첨부파일 상세 삭제
     @Override
+    @Transactional
     public void deleteAttachmentDetail(Long attachmentId) {
         List<AttachmentDetail> attachments = attachmentDetailRepository.findByAttachmentId(attachmentId);
         if(attachments.isEmpty()){
@@ -78,12 +79,16 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
 
         for (AttachmentDetail attachment : attachments) {
-            storageService.deleteFile(attachment.getSavedFileName());
+            //db delete를 먼저 해야 예외가 터져도 storage deleteFile까지 안함
             attachmentDetailRepository.delete(attachment);
+            if (!storageService.deleteFile(attachment.getSavedFileName())) {
+                storageDeleteOutboxService.save(attachment.getSavedFileName());
+            }
         }
     }
 
     @Override
+    @Transactional
     public ThumbnailResponse updateAttachment(Long attachmentId, List<MultipartFile> files) {
 
         //storage 업로드

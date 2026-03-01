@@ -1,8 +1,7 @@
-package com.yumyum.sns.infra.s3;
+package com.yumyum.sns.infra;
 
-import io.awspring.cloud.s3.S3Operations;
+import com.yumyum.sns.infra.service.StorageDeleteOutboxService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -11,13 +10,11 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class S3RollbackManager implements com.yumyum.sns.infra.RollbackManager {
+public class RollbackManagerImpl implements RollbackManager{
 
-    @Value("${spring.cloud.aws.s3.bucket}")
-    private String bucket;
-    private final S3Operations s3Operations;
+    private final StorageService storageService;
+    private final StorageDeleteOutboxService storageDeleteOutboxService;
 
-    //트랜잭션 롤백시 업로드 된 s3 파일 삭제
     @Override
     public void deleteIfTransactionRollback(List<String> fileNames) {
         TransactionSynchronizationManager.registerSynchronization(
@@ -25,12 +22,14 @@ public class S3RollbackManager implements com.yumyum.sns.infra.RollbackManager {
                     @Override
                     public void afterCompletion(int status) {
                         if (status == STATUS_ROLLED_BACK) {
-                            fileNames.stream()
-                                    .forEach(savedFileName -> s3Operations.deleteObject(bucket, savedFileName));
+                            for (String fileName : fileNames) {
+                                if (!storageService.deleteFile(fileName)) {
+                                    storageDeleteOutboxService.save(fileName); // 여기
+                                }
+                            }
                         }
                     }
                 }
         );
     }
-
 }

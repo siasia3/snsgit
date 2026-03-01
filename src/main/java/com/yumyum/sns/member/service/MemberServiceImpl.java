@@ -28,41 +28,48 @@ public class MemberServiceImpl implements MemberService{
 
     //회원 pk로 회원 확인
     @Override
+    @Transactional(readOnly = true)
     public Boolean checkMember(Long memberId) {
         return memberRepository.findById(memberId).isPresent();
     }
 
     //식별자로 회원 조회
     @Override
+    @Transactional(readOnly = true)
     public Member getMemberByIdentifier(String identifier) {
         return memberRepository.findByIdentifier(identifier).orElseThrow(() -> new MemberNotFoundException(identifier + " 식별자를 가진 회원이 존재하지 않습니다"));
     }
 
     //회원 pk로 회원 조회
     @Override
+    @Transactional(readOnly = true)
     public Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId + " id를 가진 회원이 존재하지 않습니다"));
     }
 
     //닉네임 회원 조회
     @Override
+    @Transactional(readOnly = true)
     public Member getMemberByNickname(String nickname) {
         return memberRepository.findByNickname(nickname).orElseThrow(() -> new MemberNotFoundException(nickname + " 닉네임을 가진 회원이 존재하지 않습니다."));
     }
 
     //닉네임 중복 확인
     @Override
+    @Transactional(readOnly = true)
     public boolean checkNicknameDuplicate(String nickname) {
         return memberRepository.existsByNickname(nickname);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean checkUserIdDuplicate(String userId) {
         return memberRepository.existsByUserId(userId);
     }
 
     //식별자 회원 확인
     @Override
+    @Transactional(readOnly = true)
     public Optional<Member> checkIdentifier(String identifier) {
         return memberRepository.findByIdentifier(identifier);
     }
@@ -100,12 +107,14 @@ public class MemberServiceImpl implements MemberService{
 
     //닉네임 검색 시 회원 정보 조회
     @Override
+    @Transactional(readOnly = true)
     public MemberSearchDto getSearchMember(String nickName) {
         return memberRepository.findMemberSearch(nickName).orElseThrow(()-> new MemberNotFoundException(nickName + " 닉네임을 가진 회원이 존재하지 않습니다."));
     }
 
     //닉네임을 통해 회원 미리보기 조회
     @Override
+    @Transactional(readOnly = true)
     public List<NicknamePreviewDto> previewUserByNickname(String keyword) {
         List<Member> previewMembers = memberRepository.getPreviewByNickname(keyword);
         List<NicknamePreviewDto> previewDtos = previewMembers.stream()
@@ -116,6 +125,7 @@ public class MemberServiceImpl implements MemberService{
 
     //프로필편집 정보 조회
     @Override
+    @Transactional(readOnly = true)
     public MemberEditDto getMemberEditInfo(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId + " id를 가진 회원이 존재하지 않습니다"));
         return MemberEditDto.toDto(member);
