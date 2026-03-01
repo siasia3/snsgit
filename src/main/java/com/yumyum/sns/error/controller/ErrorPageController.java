@@ -15,6 +15,11 @@ public class ErrorPageController {
         return "error/500";
     }
 
+    @GetMapping("/404")
+    public String error44(){
+        return "error/404";
+    }
+
     @GetMapping("/home")
     public String home(Authentication authentication){
         if (authentication != null
