@@ -47,6 +47,14 @@ public interface PostRepositoryCustom {
 
 
 
+    /**
+     * 게시글 페이징조회 (WHERE IN 배치 조회 버전)
+     * @param cursor cursor 페이징
+     * @param memberId 회원ID
+     * @return 조회된 게시글들
+     */
+    List<PostResponseDTO> findPagingPostsWithIn(PostCursorRequest cursor, Long memberId);
+
     //총 게시글 개수 조회
     Long countTotalPosts();
 }

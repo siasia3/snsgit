@@ -24,7 +24,7 @@ public class RollbackManagerImpl implements RollbackManager{
                         if (status == STATUS_ROLLED_BACK) {
                             for (String fileName : fileNames) {
                                 if (!storageService.deleteFile(fileName)) {
-                                    storageDeleteOutboxService.save(fileName); // 여기
+                                    storageDeleteOutboxService.save(fileName);
                                 }
                             }
                         }

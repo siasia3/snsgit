@@ -3,12 +3,14 @@ package com.yumyum.sns.infra.service;
 import com.yumyum.sns.infra.entity.StorageDeleteOutbox;
 import com.yumyum.sns.infra.repository.StorageDeleteOutboxRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StorageDeleteOutboxService {
@@ -18,7 +20,11 @@ public class StorageDeleteOutboxService {
     // 실패한 파일 저장
     @Transactional
     public void save(String fileName) {
-        outboxRepository.save(new StorageDeleteOutbox(fileName));
+        try {
+            outboxRepository.save(new StorageDeleteOutbox(fileName));
+        } catch (Exception e) {
+            log.error("[CRITICAL] Outbox 저장 실패. 수동 처리 필요. fileName={}", fileName, e);
+        }
     }
 
     // PENDING 목록 조회

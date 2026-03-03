@@ -91,6 +91,9 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Transactional
     public ThumbnailResponse updateAttachment(Long attachmentId, List<MultipartFile> files) {
 
+        Attachment attachment = attachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new AttachmentNotFoundException("잘못된 첨부파일 ID: " + attachmentId));
+
         //storage 업로드
         List<AttachDto> attachDtos = storageService.uploadFiles(files);
         //롤백시 storage 정리
@@ -99,13 +102,9 @@ public class AttachmentServiceImpl implements AttachmentService {
         //삭제 후 등록하는 방식으로 수정
         deleteAttachmentDetail(attachmentId);
 
-        Attachment attachment = attachmentRepository.findById(attachmentId)
-                .orElseThrow(() -> new AttachmentNotFoundException("잘못된 첨부파일 ID: " + attachmentId));
-
         for (AttachDto attachDto : attachDtos) {
             attachmentDetailRepository.save(attachDto.toEntity(attachment));
         }
-
         return new ThumbnailResponse(attachment, attachDtos.get(0).getPath());
 
     }

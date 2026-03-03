@@ -1,5 +1,6 @@
 package com.yumyum.sns.post.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -13,7 +14,9 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 import static com.yumyum.sns.attachment.entity.QAttachment.attachment;
@@ -80,6 +83,93 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .limit(cursor.getSize()+1)
                 .fetch();
         return postList;
+    }
+
+    //페이징된 게시글 조회 (WHERE IN 배치 조회 버전)
+    @Override
+    public List<PostResponseDTO> findPagingPostsWithIn(PostCursorRequest cursor, Long memberId) {
+
+        BooleanExpression cursorCondition = null;
+        LocalDateTime cursorCreatedAt = cursor.getCursorCreatedAt();
+        Long cursorPostId = cursor.getCursorPostId();
+
+        if (cursorCreatedAt != null && cursorPostId != null) {
+            cursorCondition = post.createdAt.lt(cursorCreatedAt)
+                    .or(
+                            post.createdAt.eq(cursorCreatedAt)
+                                    .and(post.id.lt(cursorPostId))
+                    );
+        }
+
+        // Step 1: 기본 게시글 목록 조회 (집계 없이)
+        List<Tuple> rows = queryFactory
+                .select(post.id, member.id, member.nickname, member.profileImage, attachment.id, post.content, post.createdAt)
+                .from(post)
+                .join(post.member, member)
+                .join(post.attachment, attachment)
+                .where(cursorCondition)
+                .orderBy(post.createdAt.desc())
+                .limit(cursor.getSize() + 1)
+                .fetch();
+
+        if (rows.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> postIds = rows.stream()
+                .map(t -> t.get(post.id))
+                .collect(Collectors.toList());
+
+        // Step 2: 좋아요 수 IN 배치 조회
+        Map<Long, Long> likeCountMap = queryFactory
+                .select(likes.post.id, likes.id.count())
+                .from(likes)
+                .where(likes.post.id.in(postIds))
+                .groupBy(likes.post.id)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(t -> t.get(likes.post.id), t -> t.get(likes.id.count())));
+
+        // Step 3: 댓글 수 IN 배치 조회
+        Map<Long, Long> commentCountMap = queryFactory
+                .select(comment.post.id, comment.id.count())
+                .from(comment)
+                .where(comment.post.id.in(postIds))
+                .groupBy(comment.post.id)
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(t -> t.get(comment.post.id), t -> t.get(comment.id.count())));
+
+        // Step 4: 현재 회원의 좋아요 ID IN 배치 조회
+        Map<Long, Long> likeIdMap = queryFactory
+                .select(likes.post.id, likes.id)
+                .from(likes)
+                .where(
+                        likes.post.id.in(postIds),
+                        likes.member.id.eq(memberId)
+                )
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(t -> t.get(likes.post.id), t -> t.get(likes.id)));
+
+        // Step 5: 결과 조립
+        return rows.stream()
+                .map(t -> {
+                    Long postId = t.get(post.id);
+                    return new PostResponseDTO(
+                            postId,
+                            t.get(member.id),
+                            t.get(member.nickname),
+                            t.get(member.profileImage),
+                            t.get(attachment.id),
+                            t.get(post.content),
+                            t.get(post.createdAt),
+                            likeCountMap.getOrDefault(postId, 0L),
+                            commentCountMap.getOrDefault(postId, 0L),
+                            likeIdMap.get(postId)
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     //게시글 상세 조회
