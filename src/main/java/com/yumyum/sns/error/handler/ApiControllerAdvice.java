@@ -22,6 +22,7 @@ public class ApiControllerAdvice {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException e) {
         ErrorCode errorCode = e.getErrorCode();
+        log.warn("BusinessException: [{}] {}", errorCode, e.getMessage());
         return ResponseEntity
                 .status(errorCode.getStatus())
                 .body(ApiResponse.fail(e.getMessage()));
