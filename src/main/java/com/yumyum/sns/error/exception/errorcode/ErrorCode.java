@@ -27,6 +27,7 @@ public enum ErrorCode {
 
     // Like
     LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 찾을 수 없습니다."),
+    DUPLICATE_LIKE(HttpStatus.CONFLICT, "이미 좋아요한 게시글입니다."),
 
     // Chat
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "채팅방을 찾을 수 없습니다."),

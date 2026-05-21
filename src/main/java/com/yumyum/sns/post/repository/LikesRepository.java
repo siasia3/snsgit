@@ -5,4 +5,5 @@ import com.yumyum.sns.post.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LikesRepository extends JpaRepository<Likes,Long> {
+    boolean existsByPostIdAndMemberId(Long postId, Long memberId);
 }

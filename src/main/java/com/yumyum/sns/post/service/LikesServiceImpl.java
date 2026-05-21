@@ -26,6 +26,11 @@ public class LikesServiceImpl implements LikesService {
     public Long createLike(LikeDto likeDto, String identifier) {
         Member checkMember = memberService.getMemberByIdentifier(identifier);
         Post post = postService.getPostById(likeDto.getPostId());
+
+        if (likesRepository.existsByPostIdAndMemberId(post.getId(), checkMember.getId())) {
+            throw new BusinessException(ErrorCode.DUPLICATE_LIKE);
+        }
+
         Likes savedLike = likesRepository.save(new Likes(post, checkMember));
         return savedLike.getId();
     }
