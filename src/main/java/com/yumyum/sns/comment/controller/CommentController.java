@@ -2,7 +2,6 @@ package com.yumyum.sns.comment.controller;
 
 import com.yumyum.sns.comment.dto.*;
 import com.yumyum.sns.comment.service.CommentService;
-import com.yumyum.sns.security.oauthjwt.jwt.JWTUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -18,16 +17,15 @@ import java.util.Map;
 @RequestMapping("/api")
 public class CommentController {
 
-    private final JWTUtil jwtUtil;
     private final CommentService commentService;
 
 
     @PostMapping(value = "/comment")
     public ResponseEntity<CommentResponseDto> createComment(
-                                        @CookieValue(name = "Authorization") String jwt,
+                                        Authentication authentication,
                                         @Valid @RequestBody CommentRequestDto commentRequestDto){
 
-        String identifier = jwtUtil.getUsername(jwt);
+        String identifier = authentication.getName();
         CommentResponseDto comment = commentService.createComment(commentRequestDto, identifier);
 
         return ResponseEntity.ok(comment);

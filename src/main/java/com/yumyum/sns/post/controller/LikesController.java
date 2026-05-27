@@ -1,6 +1,6 @@
 package com.yumyum.sns.post.controller;
 
-import com.yumyum.sns.security.oauthjwt.jwt.JWTUtil;
+import org.springframework.security.core.Authentication;
 import com.yumyum.sns.post.dto.LikeDto;
 import com.yumyum.sns.post.service.LikesService;
 import com.yumyum.sns.validated.group.DeleteGroup;
@@ -16,15 +16,14 @@ import org.springframework.web.bind.annotation.*;
 public class LikesController {
 
 
-    private final JWTUtil jwtUtil;
     private final LikesService likesService;
 
 
     @PostMapping(value = "/like")
-    public ResponseEntity<Long> createLike(@CookieValue(name = "Authorization") String jwt,
+    public ResponseEntity<Long> createLike(Authentication authentication,
                                         @Validated(InsertGroup.class) @RequestBody LikeDto likeDto){
 
-        String identifier = jwtUtil.getUsername(jwt);
+        String identifier = authentication.getName();
         Long likeId = likesService.createLike(likeDto, identifier);
         return ResponseEntity.ok(likeId);
     }

@@ -5,7 +5,6 @@ import com.yumyum.sns.member.entity.Member;
 import com.yumyum.sns.member.service.MemberService;
 import com.yumyum.sns.security.common.AuthMember;
 import com.yumyum.sns.security.oauthjwt.dto.CustomOAuth2User;
-import com.yumyum.sns.security.oauthjwt.jwt.JWTUtil;
 import com.yumyum.sns.post.dto.*;
 import com.yumyum.sns.post.service.PostFacadeService;
 import com.yumyum.sns.post.service.PostService;
@@ -28,12 +27,11 @@ public class PostController {
     private final PostFacadeService postFacadeService;
     private final PostService postService;
     private final MemberService memberService;
-    private final JWTUtil jwtUtil;
     private static final int MAX_SIZE = 15;
 
     //게시글 등록
     @PostMapping(value = "/post", consumes = "multipart/form-data")
-    public ResponseEntity<Map<String,String>> createPost(@CookieValue(name = "Authorization") String jwt,
+    public ResponseEntity<Map<String,String>> createPost(Authentication authentication,
                                         @RequestPart(value= "postContent", required = false) PostRequestDto postRequestDto,
                                         @RequestPart(value = "files") List<MultipartFile> files){
 
@@ -49,7 +47,7 @@ public class PostController {
             return ResponseEntity.badRequest().body(Map.of("message","이미지나 동영상 파일이 아닙니다."));
         }
 
-        String identifier = jwtUtil.getUsername(jwt);
+        String identifier = authentication.getName();
         Long postId = postFacadeService.registerPost(postRequestDto, files, identifier);
 
         return ResponseEntity.ok(Map.of("message","게시글이 정상적으로 작성되었습니다."));
@@ -80,8 +78,8 @@ public class PostController {
     //게시글 목록 조회
     @GetMapping(value = "/posts")
     public ResponseEntity<PostSliceDto> getPosts(PostCursorRequest cursor,
-                                 @CookieValue(name = "Authorization") String jwt){
-        String username = jwtUtil.getUsername(jwt);
+                                 Authentication authentication){
+        String username = authentication.getName();
         Member member = memberService.getMemberByIdentifier(username);
         PostSliceDto postsWithInfo = postFacadeService.getPostsWithInfo(cursor, member.getId());
         return ResponseEntity.ok(postsWithInfo);
@@ -89,9 +87,9 @@ public class PostController {
 
     //게시글 상세 조회
     @GetMapping(value = "/post/{postId}")
-    public ResponseEntity<PostDetailDto> getPostDetail(@CookieValue(name = "Authorization") String jwt,
+    public ResponseEntity<PostDetailDto> getPostDetail(Authentication authentication,
                                        @PathVariable Long postId){
-        String username = jwtUtil.getUsername(jwt);
+        String username = authentication.getName();
         Member member = memberService.getMemberByIdentifier(username);
         PostDetailDto postDetailWithInfo = postService.getPostDetailWithInfo(member.getId(), postId);
         return ResponseEntity.ok(postDetailWithInfo);
