@@ -46,7 +46,18 @@ export const options = {
 
 // MAX_VUS 수만큼만 로그인 (1000개 전부 로그인할 필요 없음)
 export function setup() {
-    return setupSessions(MAX_VUS);
+    const sessions = setupSessions(MAX_VUS);
+
+    // 캐시 워밍업: 테스트 시작 전 첫 페이지 캐시 채우기
+    const warmupSession = sessions.find(s => s.cookieHeader);
+    if (warmupSession) {
+        http.get(`${BASE_URL}/api/posts?size=${PAGE_SIZE}`, {
+            headers: { 'Content-Type': 'application/json', Cookie: warmupSession.cookieHeader },
+        });
+        console.log('[캐시 워밍업 완료] 피드 첫 페이지 캐시 적재');
+    }
+
+    return sessions;
 }
 
 export default function (sessions) {
@@ -117,17 +128,24 @@ export default function (sessions) {
             try { return Array.isArray(r.json('content')); } catch { return false; }
         },
         '커서 중복 없음': (r) => {
-            // 다음 페이지의 첫 게시글 ID가 이전 마지막 ID보다 작아야 함
+            // 정렬 기준: createdAt DESC, id DESC
+            // 다음 페이지 첫 게시글은 createdAt이 커서보다 이전이거나,
+            // 같은 경우 postId가 커서보다 작아야 함
             try {
                 const content = r.json('content');
-                return content.length === 0 || content[0].postId < cursorPostId;
+                if (content.length === 0) return true;
+                const first = content[0];
+                return first.createdAt < cursorCreatedAt ||
+                       (first.createdAt === cursorCreatedAt && first.postId < cursorPostId);
             } catch { return false; }
         },
     });
 
     errorRate.add(nextOk ? 0 : 1);
     if (!nextOk) {
-        console.log(`[피드 다음 페이지 실패] VU=${__VU}, userId=${session.userId}, status=${nextRes.status}`);
+        let body;
+        try { body = JSON.stringify(nextRes.json()); } catch { body = nextRes.body?.slice(0, 200); }
+        console.log(`[피드 다음 페이지 실패] VU=${__VU}, userId=${session.userId}, status=${nextRes.status}, cursorPostId=${cursorPostId}, cursorCreatedAt=${cursorCreatedAt}, body=${body}`);
     }
 
     sleep(0.5);
