@@ -4,6 +4,7 @@ import com.yumyum.sns.error.exception.ApiResponse;
 import com.yumyum.sns.member.entity.Member;
 import com.yumyum.sns.member.service.MemberService;
 import com.yumyum.sns.security.common.AuthMember;
+import com.yumyum.sns.security.login.dto.CustomUserDetails;
 import com.yumyum.sns.security.oauthjwt.dto.CustomOAuth2User;
 import com.yumyum.sns.post.dto.*;
 import com.yumyum.sns.post.service.PostFacadeService;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,20 +80,18 @@ public class PostController {
     //게시글 목록 조회
     @GetMapping(value = "/posts")
     public ResponseEntity<PostSliceDto> getPosts(PostCursorRequest cursor,
-                                 Authentication authentication){
-        String username = authentication.getName();
-        Member member = memberService.getMemberByIdentifier(username);
-        PostSliceDto postsWithInfo = postFacadeService.getPostsWithInfo(cursor, member.getId());
+                                         @AuthenticationPrincipal CustomUserDetails customUser){
+        Long userId = customUser.getUserId();
+        PostSliceDto postsWithInfo = postFacadeService.getPostsWithInfo(cursor, userId);
         return ResponseEntity.ok(postsWithInfo);
     }
 
     //게시글 상세 조회
     @GetMapping(value = "/post/{postId}")
-    public ResponseEntity<PostDetailDto> getPostDetail(Authentication authentication,
+    public ResponseEntity<PostDetailDto> getPostDetail(@AuthenticationPrincipal CustomUserDetails customUser,
                                        @PathVariable Long postId){
-        String username = authentication.getName();
-        Member member = memberService.getMemberByIdentifier(username);
-        PostDetailDto postDetailWithInfo = postService.getPostDetailWithInfo(member.getId(), postId);
+        Long userId = customUser.getUserId();
+        PostDetailDto postDetailWithInfo = postService.getPostDetailWithInfo(userId, postId);
         return ResponseEntity.ok(postDetailWithInfo);
     }
 

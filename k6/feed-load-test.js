@@ -18,10 +18,11 @@ const feedNextPageDuration  = new Trend('feed_next_page_duration');
 const errorRate             = new Rate('error_rate');
 const emptyFeedCount        = new Counter('empty_feed_count');
 
-const MAX_VUS   = 100;
+const MAX_VUS   = 400;
 const PAGE_SIZE = 10;
 
 export const options = {
+    setupTimeout: '120s',
     scenarios: {
         feed_ramp_up: {
             executor: 'ramping-vus',
